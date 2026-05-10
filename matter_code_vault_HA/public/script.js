@@ -1,4 +1,4 @@
-window.APP_VERSION = "3.2.6";
+window.APP_VERSION = "0.0.0";
 window.CURRENT_AI_MODEL = "antigravity-model:3b";
 window.VISION_MODEL = "moondream";
 window.REASONING_MODEL = "antigravity-model:3b";
@@ -94,6 +94,12 @@ async function loadData() {
             const configRes = await fetch(`api/config?t=${timestamp}`);
             if (configRes.ok) {
                 const addonConfig = await configRes.json();
+                if (addonConfig.version) {
+                    window.APP_VERSION = addonConfig.version;
+                    // Update UI Version Displays
+                    document.querySelectorAll('.app-version').forEach(el => el.textContent = 'v' + window.APP_VERSION);
+                    document.title = `Matter Code Vault v${window.APP_VERSION}`;
+                }
                 if (addonConfig.api_key) {
                     configs.apiKey = addonConfig.api_key;
                     console.log("Synced API Key from HA Options");

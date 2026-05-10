@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
 const path = require('path');
+const pkg = require('./package.json'); // Centralized Version
 const app = express();
 const PORT = 8099;
 
@@ -82,13 +83,13 @@ app.get('/api/config', (req, res) => {
         try {
             // Read file directly from disk every time
             const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-            res.json(config);
+            res.json({ ...config, version: pkg.version });
         } catch (e) {
             console.error("Config read error:", e);
             res.status(500).json({ error: "Failed to read config" });
         }
     } else {
-        res.json({});
+        res.json({ version: pkg.version });
     }
 });
 
