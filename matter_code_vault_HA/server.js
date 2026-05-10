@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const fs = require('fs');
@@ -128,14 +129,17 @@ app.post('/api/data', (req, res) => {
 
 // API: AI Proxy (Forward requests to local Ollama)
 app.post('/api/ai', async (req, res) => {
-    // 1. Get IP from config/options (Default to 192.168.0.32)
-    let ollamaIp = "192.168.0.32";
+    // 1. Resolve OLLAMA IP (Priority: HA Options > .env > Default)
+    let ollamaIp = process.env.OLLAMA_IP || "192.168.0.32";
+    
     if (fs.existsSync(configPath)) {
         try {
             const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-            if (config.ollama_ip) ollamaIp = config.ollama_ip;
+            if (config.ollama_ip && config.ollama_ip.trim() !== "") {
+                ollamaIp = config.ollama_ip;
+            }
         } catch (e) {
-            console.warn("[AI Proxy] Failed to read ollama_ip from config, using default.");
+            console.warn("[AI Proxy] Failed to read ollama_ip from config.");
         }
     }
 
