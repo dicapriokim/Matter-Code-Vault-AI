@@ -1,28 +1,44 @@
 const fs = require('fs');
 const path = require('path');
 
-// 1. Read package.json (SSOT)
+// 1. Read package.json (Single Source of Truth)
 const pkgPath = path.join(__dirname, 'matter_code_vault_HA', 'package.json');
 const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
 const version = pkg.version;
 
-console.log(`Syncing version: ${version}`);
+console.log(`[Sync] Starting version synchronization to v${version}...`);
 
-// 2. Sync config.yaml
+// 2. Update config.yaml
 const configPath = path.join(__dirname, 'matter_code_vault_HA', 'config.yaml');
 let configContent = fs.readFileSync(configPath, 'utf8');
 configContent = configContent.replace(/version: ".*"/, `version: "${version}"`);
 fs.writeFileSync(configPath, configContent);
-console.log('✔ Sync config.yaml');
+console.log('✔ config.yaml updated.');
 
-// 3. Sync README.md
+// 3. Update README.md (All occurrences)
 const readmePath = path.join(__dirname, 'README.md');
 let readmeContent = fs.readFileSync(readmePath, 'utf8');
-// Replace version in title and subtitle
-readmeContent = readmeContent.replace(/HA \(v.*\)/g, `HA (v${version})`);
-readmeContent = readmeContent.replace(/Tool \(v.*\)/g, `Tool (v${version})`);
-readmeContent = readmeContent.replace(/Key Features \(v.* Update\)/g, `Key Features (v${version} Update)`);
-fs.writeFileSync(readmePath, readmeContent);
-console.log('✔ Sync README.md');
 
-console.log('Done! Everything is synced to v' + version);
+// Title & Subtitle
+readmeContent = readmeContent.replace(/# Matter Code Vault HA \(v.*\)/g, `# Matter Code Vault HA (v${version})`);
+readmeContent = readmeContent.replace(/> Matter Device Management & QR Code Backup\/Restore Tool \(v.*\)/g, `> Matter Device Management & QR Code Backup/Restore Tool (v${version})`);
+
+// Feature Section
+readmeContent = readmeContent.replace(/## ✨ Key Features \(v.* Update\)/g, `## ✨ Key Features (v${version} Update)`);
+
+// Guide Section
+readmeContent = readmeContent.replace(/## 📖 Quick Start Guide \(v.*\)/g, `## 📖 Quick Start Guide (v${version})`);
+readmeContent = readmeContent.replace(/## 📖 Quick Start Guide/g, `## 📖 Quick Start Guide (v${version})`); // For first time
+
+fs.writeFileSync(readmePath, readmeContent);
+console.log('✔ README.md updated.');
+
+// 4. Update index.html (Backup check for hardcoded versions)
+const indexPath = path.join(__dirname, 'matter_code_vault_HA', 'public', 'index.html');
+let indexContent = fs.readFileSync(indexPath, 'utf8');
+// Though we use .app-version placeholders, we keep the <title> tag updated as well
+indexContent = indexContent.replace(/<title>Matter Code Vault.*<\/title>/, `<title>Matter Code Vault v${version}</title>`);
+fs.writeFileSync(indexPath, indexContent);
+console.log('✔ index.html title updated.');
+
+console.log(`[Sync] Done! All files are now synchronized to v${version}.`);
