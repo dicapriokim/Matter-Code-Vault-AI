@@ -62,10 +62,16 @@ function onScanSuccess(decodedText) {
         document.getElementById('qrStatusIcon').classList.remove('hidden');
         const decoded = decodeMatterPayload(decodedText);
         applyDecodedInfo(decoded);
-        const currentCode = document.getElementById('devPayload').value;
-        if (currentCode && currentCode.replace(/-/g, '').length === 11) {
-            showToast("데이터 인식 완료!"); stopCamera();
-        } else showToast("QR 인식됨! 숫자를 찾는 중...");
+        if (decoded && decoded.manualCode) {
+            handleInput(decoded.manualCode);
+            showToast("QR 기반 디지털 코드 산출 완료!"); 
+            stopCamera();
+        } else {
+            const currentCode = document.getElementById('devPayload').value;
+            if (currentCode && currentCode.replace(/-/g, '').length === 11) {
+                showToast("데이터 인식 완료!"); stopCamera();
+            } else showToast("QR 인식됨! 숫자를 찾는 중...");
+        }
     }
 }
 
@@ -140,7 +146,12 @@ async function processOcrImage(event) {
             document.getElementById('devMtPayload').value = qrCode;
             document.getElementById('displayMtPayload').value = qrCode;
             document.getElementById('qrStatusIcon').classList.remove('hidden');
-            applyDecodedInfo(decodeMatterPayload(qrCode));
+            const decoded = decodeMatterPayload(qrCode);
+            applyDecodedInfo(decoded);
+            if (decoded && decoded.manualCode) {
+                handleInput(decoded.manualCode);
+                showToast("QR 디지털 코드 추출 성공");
+            }
         }
 
         // Fallback: If QR didn't fill the 11-digit pairing code, try OCR
@@ -260,7 +271,12 @@ async function executeAiAnalysis(base64Data) {
             document.getElementById('devMtPayload').value = info.mt;
             document.getElementById('displayMtPayload').value = info.mt;
             document.getElementById('qrStatusIcon').classList.remove('hidden');
-            applyDecodedInfo(decodeMatterPayload(info.mt));
+            const decoded = decodeMatterPayload(info.mt);
+            applyDecodedInfo(decoded);
+            if (decoded && decoded.manualCode) {
+                console.log("[AI-QR] Digital Correction (v4.0.0):", decoded.manualCode);
+                info.code = decoded.manualCode;
+            }
         }
         showToast("AI 분석 완료");
     } catch (e) {

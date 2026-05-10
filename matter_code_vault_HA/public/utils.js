@@ -141,9 +141,41 @@ function decodeMatterPayload(payload) {
             if (charCode === -1) return null;
             bigIntValue = bigIntValue * BigInt(38) + BigInt(charCode);
         }
+
+        // 비트 추출
         const vid = Number((bigIntValue >> BigInt(3)) & BigInt(0xFFFF));
+        const discriminator = Number((bigIntValue >> BigInt(45)) & BigInt(0xFFF));
         const setupPin = Number((bigIntValue >> BigInt(57)) & BigInt(0x7FFFFFF));
-        return { vid, setupPin };
+
+        // 11자리 수동 코드 연산 (Setup PIN & Short Discriminator)
+        const shortDiscriminator = discriminator >> 8; 
+        const manualCodeValue = (setupPin * 32) + (shortDiscriminator * 2); 
+        const manualCodeStr = String(manualCodeValue).padStart(10, '0');
+
+        // Verhoeff Checksum (Check Digit 생성)
+        const d = [
+            [0,1,2,3,4,5,6,7,8,9], [1,2,3,4,0,6,7,8,9,5], [2,3,4,0,1,7,8,9,5,6],
+            [3,4,0,1,2,8,9,5,6,7], [4,0,1,2,3,9,5,6,7,8], [5,9,8,7,6,0,4,3,2,1],
+            [6,5,9,8,7,1,0,4,3,2], [7,6,5,9,8,2,1,0,4,3], [8,7,6,5,9,3,2,1,0,4],
+            [9,8,7,6,5,4,3,2,1,0]
+        ];
+        const p = [
+            [0,1,2,3,4,5,6,7,8,9], [1,5,7,6,2,8,3,0,9,4], [5,8,0,3,7,9,6,1,4,2],
+            [8,9,1,6,0,4,3,5,2,7], [9,4,5,3,1,2,6,8,7,0], [4,2,8,6,5,7,3,9,0,1],
+            [2,7,9,3,8,0,6,4,1,5], [7,0,4,6,9,1,3,2,5,8]
+        ];
+        const inv = [0,4,3,2,1,5,6,7,8,9];
+
+        let c = 0;
+        let reversed = manualCodeStr.split('').reverse();
+        for (let i = 0; i < reversed.length; i++) {
+            c = d[c][p[(i + 1) % 8][parseInt(reversed[i])]];
+        }
+        
+        const fullCode = manualCodeStr + inv[c];
+        const formattedManualCode = `${fullCode.substring(0,4)}-${fullCode.substring(4,7)}-${fullCode.substring(7,11)}`;
+
+        return { vid, setupPin, discriminator, manualCode: formattedManualCode };
     } catch (e) { return null; }
 }
 
