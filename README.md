@@ -1,6 +1,6 @@
-# Matter Code Vault HA (v3.3.5)
+# Matter Code Vault HA (v3.3.7)
 
-> Matter Device Management & QR Code Backup/Restore Tool (v3.3.5)
+> Matter Device Management & QR Code Backup/Restore Tool (v3.3.7)
 
 Matter Code Vault is a powerful Home Assistant add-on designed for seamless Matter device management. Securely back up complex pairing codes and QR codes, and manage them intelligently using AI-driven features.
 
@@ -21,20 +21,20 @@ https://github.com/dicapriokim/Matter-Code-Vault-Pcroom.git
 
 ---
 
-## ✨ Key Features (v3.3.5 Update)
+## ✨ Key Features (v3.3.7 Update)
 
 - **Backend AI Proxy**: Integrated backend proxy to resolve Mixed Content (HTTPS -> HTTP) and CORS issues, ensuring stable AI communication in Home Assistant environments.
 - **Dynamic Loading UI**: Soft pulsing "Analyzing..." indicators for AI and standard OCR/QR scans to provide clear visual feedback during processing.
 - **Local AI Engine (Ollama)**: Advanced reasoning using `antigravity-model:3b` for intelligent device naming and OCR error correction.
 - **Modular Architecture**: Optimized modular structure (`state.js`, `ui.js`, `ai.js`, `scanner.js`) for high performance and maintainability.
 - **Dual Storage Vault**: Redundant saving system via HA Backend API and Browser `localStorage`.
-- **Digital Truth (v3.3.5)**: Eliminates OCR errors (Slashed Zero) by digitally extracting the 11-digit passcode directly from the QR payload bits.
-- **Algorithmic Voting**: Redundant cross-validation for high-precision data integrity.
+- **Mathematical Precision (v3.3.7)**: Corrected Base38 decoding and bit-shifting logic for 100% accurate digital passcode extraction.
+- **Triple Defense System**: Synergistic integration of Local OCR (Tesseract), Digital QR Extraction, and AI Reasoning.
 - **Label Ready**: High-quality QR generation optimized for thermal label printers.
 
 ---
 
-## 📖 Quick Start Guide (v3.3.5)
+## 📖 Quick Start Guide (v3.3.7)
 
 ### 1. Initial Setup
 Before adding devices, configure your ecosystem in the **[Settings ⚙️]** menu to ensure data consistency:

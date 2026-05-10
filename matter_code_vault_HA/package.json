@@ -1,7 +1,7 @@
 {
   "name": "matter-code-vault-addon",
-  "version": "3.3.5",
-  "description": "Matter Code Vault Home Assistant Add-on",
+  "version": "3.3.7",
+  "description": "Matter Code Vault Home Assistant Add-on (v3.3.7)",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
