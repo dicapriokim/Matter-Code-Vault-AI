@@ -20,15 +20,11 @@ const readmePath = path.join(__dirname, 'README.md');
 let readmeContent = fs.readFileSync(readmePath, 'utf8');
 
 // Title & Subtitle
-readmeContent = readmeContent.replace(/# Matter Code Vault HA \(v.*\)/g, `# Matter Code Vault HA (v${version})`);
+readmeContent = readmeContent.replace(/# Matter Code Vault.* \(v.*\)/g, `# Matter Code Vault (v${version})`);
 readmeContent = readmeContent.replace(/> Matter Device Management & QR Code Backup\/Restore Tool \(v.*\)/g, `> Matter Device Management & QR Code Backup/Restore Tool (v${version})`);
-
-// Feature Section
-readmeContent = readmeContent.replace(/## ✨ Key Features \(v.* Update\)/g, `## ✨ Key Features (v${version} Update)`);
 
 // Guide Section
 readmeContent = readmeContent.replace(/## 📖 Quick Start Guide \(v.*\)/g, `## 📖 Quick Start Guide (v${version})`);
-readmeContent = readmeContent.replace(/## 📖 Quick Start Guide/g, `## 📖 Quick Start Guide (v${version})`); // For first time
 
 fs.writeFileSync(readmePath, readmeContent);
 console.log('✔ README.md updated.');

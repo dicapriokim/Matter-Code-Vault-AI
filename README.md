@@ -55,7 +55,7 @@ Click the **[+]** button to add a new device.
 ## ⚙️ Configuration (AI Proxy)
 
 This add-on features a built-in **Backend AI Proxy** to enable stable communication with local AI servers in HTTPS environments.
-1. **Ollama Server**: Ensure your server is running at `http://192.168.0.32:11434`.
+1. **Ollama Server**: Ensure your server is running at `http://192.168.x.x:11434`.
 2. **Required Models**:
    - `moondream` (Vision Pass)
    - `antigravity-model:3b` (Reasoning Pass)

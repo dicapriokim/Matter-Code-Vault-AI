@@ -1,5 +1,7 @@
 # Data and Backups
 matter_data.json
+options.json
+.env
 *- 복사본.*
 
 # Dependencies

@@ -128,7 +128,7 @@ app.post('/api/data', (req, res) => {
 
 // API: AI Proxy (Forward requests to local Ollama)
 app.post('/api/ai', async (req, res) => {
-    const OLLAMA_SERVER_URL = "http://192.168.0.32:11434/api/generate";
+    const OLLAMA_SERVER_URL = "http://192.168.x.x:11434/api/generate";
     console.log(`[AI Proxy] Request received. Model: ${req.body.model}`);
     
     try {
