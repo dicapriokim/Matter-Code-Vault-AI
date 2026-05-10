@@ -14,8 +14,10 @@ init: false
 map:
   - config:rw
   - share:rw
-options: {}
-schema: {}
+options:
+  ollama_ip: "192.168.0.32"
+schema:
+  ollama_ip: str
 # image: "matter-code-vault-{arch}"
 ingress: true
 ingress_port: 8099

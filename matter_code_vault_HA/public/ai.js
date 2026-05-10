@@ -1,12 +1,14 @@
 // Constants are now managed globally in script.js
 
-async function askOllama(prompt, model = REASONING_MODEL, isJson = false) {
+async function askOllama(prompt, model, isJson = false) {
+    const targetModel = model || window.REASONING_MODEL || "antigravity-model:3b";
+    const proxyUrl = window.OLLAMA_PROXY_URL || "api/ai";
     try {
-        const res = await fetch(OLLAMA_PROXY_URL, {
+        const res = await fetch(proxyUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                model: model,
+                model: targetModel,
                 prompt: prompt,
                 stream: false,
                 options: { temperature: 0.1, keep_alive: "5m" }
@@ -51,7 +53,8 @@ async function sendAiQuery() {
     input.value = '';
 
     const systemInstruction = "너는 스마트홈, IoT, Matter 표준 전문 AI 어시스턴트야. 별도의 언급이 없더라도 모든 답변은 스마트홈, 홈 자동화, IoT 기기 맥락에서 전문적으로 답변해줘. 브랜드명(예: 아카라, 필립스 휴 등)은 일반 명사가 아닌 IoT 제품 브랜드로 인식해야 해. ";
-    const response = await askOllama(systemInstruction + query, REASONING_MODEL, false);
+    const model = window.REASONING_MODEL || "antigravity-model:3b";
+    const response = await askOllama(systemInstruction + query, model, false);
 
     const loadingEl = document.getElementById(loadingId);
     if (loadingEl) loadingEl.remove();
@@ -66,31 +69,52 @@ async function sendAiQuery() {
 }
 
 async function suggestDeviceName() {
-    const manufacturer = document.getElementById('devManufacturer').value;
-    const type = document.getElementById('devType').value;
-    const location = document.getElementById('devLoc').value;
+    console.log("[AI-Naming] Button clicked.");
+    const manufacturer = document.getElementById('devManufacturer')?.value;
+    const type = document.getElementById('devType')?.value;
+    const location = document.getElementById('devLoc')?.value;
     const nameInput = document.getElementById('devName');
     const statusEl = document.getElementById('aiNameStatus');
 
-    if (!manufacturer || !type) { showToast("제조사와 기기 종류를 먼저 선택해주세요."); return; }
+    if (!manufacturer || !type) { 
+        console.warn("[AI-Naming] Missing required fields:", { manufacturer, type });
+        showToast("제조사와 기기 종류를 먼저 선택해야 작명이 가능합니다."); 
+        return; 
+    }
 
-    if(statusEl) statusEl.classList.remove('hidden');
-    nameInput.placeholder = "AI가 생각 중...";
-    const prompt = `Matter 기기 이름을 한국어로 간결하게 추천해줘. 제조사: ${manufacturer}, 기기 종류: ${type}, 설치 장소: ${location}. 결과만 텍스트로 출력.`;
+    try {
+        if(statusEl) statusEl.classList.remove('hidden');
+        if(nameInput) nameInput.placeholder = "AI가 멋진 이름을 생각 중...";
+        
+        const prompt = `Matter 기기 이름을 한국어로 간결하게 추천해줘. 제조사: ${manufacturer}, 기기 종류: ${type}, 설치 장소: ${location || '미지정'}. 결과만 텍스트로 출력.`;
 
-    const suggestion = await askOllama(prompt, REASONING_MODEL, false);
-    
-    if(statusEl) statusEl.classList.add('hidden');
-    if (suggestion) { nameInput.value = suggestion.trim(); showToast("이름이 추천되었습니다!"); }
-    else nameInput.placeholder = "예: 거실 천장 조명";
+        console.log("[AI-Naming] Requesting suggestion for:", { manufacturer, type, location });
+        const model = window.REASONING_MODEL || "antigravity-model:3b";
+        const suggestion = await askOllama(prompt, model, false);
+        
+        if (suggestion && nameInput) { 
+            console.log("[AI-Naming] Success:", suggestion);
+            nameInput.value = suggestion.trim(); 
+            showToast("이름이 추천되었습니다!"); 
+        } else {
+            console.error("[AI-Naming] No response from AI.");
+            showToast("AI가 답변을 하지 못했습니다. 다시 시도해주세요.");
+            if(nameInput) nameInput.placeholder = "예: 거실 천장 조명";
+        }
+    } catch (err) {
+        console.error("[AI-Naming] Error:", err);
+        showToast("작명 중 오류가 발생했습니다.");
+    } finally {
+        if(statusEl) statusEl.classList.add('hidden');
+    }
 }
 
 
 
 // Window Bindings for HTML Inline Events & Scope Sharing
 if(typeof window !== 'undefined' && !window.app) window.app = {};
-window.askGemini = typeof askGemini !== 'undefined' ? askGemini : window.askGemini;
-if(typeof window.app !== 'undefined') window.app.askGemini = window.askGemini;
+window.askOllama = typeof askOllama !== 'undefined' ? askOllama : window.askOllama;
+if(typeof window.app !== 'undefined') window.app.askOllama = window.askOllama;
 window.getAIInsights = typeof getAIInsights !== 'undefined' ? getAIInsights : window.getAIInsights;
 if(typeof window.app !== 'undefined') window.app.getAIInsights = window.getAIInsights;
 window.closeAiQaModal = typeof closeAiQaModal !== 'undefined' ? closeAiQaModal : window.closeAiQaModal;

@@ -128,7 +128,18 @@ app.post('/api/data', (req, res) => {
 
 // API: AI Proxy (Forward requests to local Ollama)
 app.post('/api/ai', async (req, res) => {
-    const OLLAMA_SERVER_URL = "http://192.168.x.x:11434/api/generate";
+    // 1. Get IP from config/options (Default to 192.168.0.32)
+    let ollamaIp = "192.168.0.32";
+    if (fs.existsSync(configPath)) {
+        try {
+            const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+            if (config.ollama_ip) ollamaIp = config.ollama_ip;
+        } catch (e) {
+            console.warn("[AI Proxy] Failed to read ollama_ip from config, using default.");
+        }
+    }
+
+    const OLLAMA_SERVER_URL = `http://${ollamaIp}:11434/api/generate`;
     console.log(`[AI Proxy] Request received. Model: ${req.body.model}`);
     
     try {
