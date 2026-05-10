@@ -1,4 +1,4 @@
-name: "matter_code_vault_HA"
+name: "Matter-Code-PCroom"
 version: "3.2.1"
 slug: "matter_code_vault"
 description: "Matter 기기 관리 및 QR 코드 백업/복원 도구입니다."
