@@ -1,5 +1,10 @@
 // --- MODALS ---
-function openGuideModal() { document.getElementById('guideModal').classList.remove('hidden'); }
+function openGuideModal() { 
+    const modal = document.getElementById('guideModal');
+    modal.classList.remove('hidden');
+    const scrollable = modal.querySelector('.overflow-y-auto');
+    if (scrollable) scrollable.scrollTop = 0;
+}
 function closeGuideModal() { document.getElementById('guideModal').classList.add('hidden'); }
 function closeSettingsModal() { document.getElementById('settingsModal').classList.add('hidden'); }
 
@@ -115,12 +120,17 @@ function openModal(editId = null) {
         if (dateDisplay) dateDisplay.innerText = `Registered: ${new Date().toLocaleDateString()}`;
     }
     document.getElementById('modal').classList.remove('hidden');
+    const scrollable = document.querySelector('#modal .overflow-y-auto');
+    if (scrollable) scrollable.scrollTop = 0;
     // Icons are static now or inline-svg based, no createIcons needed
 }
 
 function closeModal() { document.getElementById('modal').classList.add('hidden'); }
 function openSettingsModal() {
-    document.getElementById('settingsModal').classList.remove('hidden');
+    const modal = document.getElementById('settingsModal');
+    modal.classList.remove('hidden');
+    const scrollable = modal.querySelector('.overflow-y-auto');
+    if (scrollable) scrollable.scrollTop = 0;
     _verify();
     // Re-fetch to ensure UI is in sync with server state
     loadData();
@@ -330,8 +340,8 @@ function renderDevices() {
                             </div>
                         </div>
                         <div class="flex gap-1 shrink-0">
-                            <button onclick="openModal('${d.id}')" class="p-1.5 text-slate-300 hover:text-indigo-500 transition-colors">${getSvg('edit-2', 14)}</button>
-                            <button onclick="confirmDelete('${d.id}')" class="p-1.5 text-slate-300 hover:text-red-500 transition-colors">${getSvg('trash', 14)}</button>
+                            <button onclick="openModal('${d.id}')" class="card-action-btn p-1.5 text-slate-300 hover:text-indigo-500 transition-colors">${getSvg('edit-2', 14)}</button>
+                            <button onclick="confirmDelete('${d.id}')" class="card-action-btn p-1.5 text-slate-300 hover:text-red-500 transition-colors">${getSvg('trash', 14)}</button>
                         </div>
                     </div>
                     <div class="bg-slate-50 rounded-xl p-3 border border-slate-100 mb-3 flex gap-3 items-center cursor-pointer hover:bg-slate-100 transition-colors" onclick="previewImage('${d.id}')">
@@ -363,7 +373,7 @@ function renderDevices() {
                 const typeIcon = getIconForType(d.type || '');
 
                 return `
-                <div class="bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex items-center justify-between gap-3 cursor-pointer hover:bg-slate-50 transition-all" onclick="previewImage('${d.id}')">
+                <div class="group bg-white rounded-2xl p-4 shadow-sm border border-slate-100 flex items-center justify-between gap-3 cursor-pointer hover:bg-slate-50 transition-all" onclick="previewImage('${d.id}')">
                     <div class="flex items-center gap-3 min-w-0 flex-1">
                         <div class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 border border-slate-100 shrink-0">
                             ${getSvg(typeIcon, 36)}
@@ -379,8 +389,8 @@ function renderDevices() {
                         </div>
                     </div>
                     <div class="flex gap-1 shrink-0" onclick="event.stopPropagation();">
-                        <button onclick="openModal('${d.id}')" class="p-2 text-slate-300 hover:text-indigo-500">${getSvg('edit-2', 16)}</button>
-                        <button onclick="confirmDelete('${d.id}')" class="p-2 text-slate-300 hover:text-red-500">${getSvg('trash', 16)}</button>
+                        <button onclick="openModal('${d.id}')" class="card-action-btn p-2 text-slate-300 hover:text-indigo-500">${getSvg('edit-2', 16)}</button>
+                        <button onclick="confirmDelete('${d.id}')" class="card-action-btn p-2 text-slate-300 hover:text-red-500">${getSvg('trash', 16)}</button>
                     </div>
                 </div>`;
             }).join('');
@@ -560,6 +570,8 @@ async function previewImage(id) {
     }
     document.getElementById('previewContainer').innerHTML = `<div class="bg-white p-6 rounded-3xl shadow-xl text-center"><h2 class="font-bold text-xl mb-2">${displayName}</h2>${previewContent}<p class="font-mono font-bold text-lg text-slate-700 ${isCreatorMode ? 'creator-text' : ''}">${displayPayload}</p>${decoderUi}</div>`;
     document.getElementById('imageViewer').classList.remove('hidden');
+    const scrollable = document.getElementById('imageViewer');
+    if (scrollable) scrollable.scrollTop = 0;
 }
 
 function closeImageViewer() {

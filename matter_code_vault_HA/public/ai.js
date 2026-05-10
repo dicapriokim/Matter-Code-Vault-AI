@@ -26,7 +26,12 @@ async function askOllama(prompt, model = REASONING_MODEL, isJson = false) {
     }
 }
 
-function getAIInsights() { document.getElementById('aiQaModal').classList.remove('hidden'); document.getElementById('aiQaInput')?.focus(); }
+function getAIInsights() { 
+    document.getElementById('aiQaModal').classList.remove('hidden'); 
+    const output = document.getElementById('aiQaOutput');
+    if (output) output.scrollTop = 0;
+    document.getElementById('aiQaInput')?.focus(); 
+}
 function closeAiQaModal() { document.getElementById('aiQaModal').classList.add('hidden'); }
 
 async function sendAiQuery() {

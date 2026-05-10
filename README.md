@@ -1,6 +1,6 @@
-# Matter Code Vault HA (v4.1.1)
+# Matter Code Vault HA (v4.2.0)
 
-> Matter Device Management & QR Code Backup/Restore Tool (v4.1.1)
+> Matter Device Management & QR Code Backup/Restore Tool (v4.2.0)
 
 Matter Code Vault is a powerful Home Assistant add-on designed for seamless Matter device management. Securely back up complex pairing codes and QR codes, and manage them intelligently using AI-driven features.
 
@@ -21,20 +21,21 @@ https://github.com/dicapriokim/Matter-Code-Vault-Pcroom.git
 
 ---
 
-## ✨ Performance Optimization (v4.1.1)
+## ✨ UI/UX Refinement (v4.2.0)
 
 - **Backend AI Proxy**: Integrated backend proxy to resolve Mixed Content (HTTPS -> HTTP) and CORS issues, ensuring stable AI communication in Home Assistant environments.
 - **Dynamic Loading UI**: Soft pulsing "Analyzing..." indicators for AI and standard OCR/QR scans to provide clear visual feedback during processing.
 - **Local AI Engine (Ollama)**: Advanced reasoning using `antigravity-model:3b` for intelligent device naming and OCR error correction.
 - **Modular Architecture**: Optimized modular structure (`state.js`, `ui.js`, `ai.js`, `scanner.js`) for high performance and maintainability.
 - **Dual Storage Vault**: Redundant saving system via HA Backend API and Browser `localStorage`.
-- **High-Speed Early Return (v4.1.1)**: Drastically reduces gallery upload analysis time by prioritizing digital extraction and local OCR before AI fallback.
-- **Matter Standard Compliance**: Full Spec 5.1.3 & 5.1.4.1 support for mathematical accuracy.
+- **Premium 3D UI (v4.2.0)**: Redesigned modal components with sophisticated 3D close buttons and improved layout.
+- **Adaptive Card Actions (v4.2.0)**: Sophisticated multi-stage hover interaction for device management icons (Hidden -> Faint -> Colored).
+- **Modal Auto-Scroll**: Intelligent scroll-to-top behavior for all modals to enhance user interaction flow.
 - **Label Ready**: High-quality QR generation optimized for thermal label printers.
 
 ---
 
-## 📖 Quick Start Guide (v4.1.1)
+## 📖 Quick Start Guide (v4.2.0)
 
 ### 1. Initial Setup
 Before adding devices, configure your ecosystem in the **[Settings ⚙️]** menu to ensure data consistency:
