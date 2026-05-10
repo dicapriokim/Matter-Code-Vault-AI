@@ -141,25 +141,39 @@ async function processOcrImage(event) {
     });
     try {
         const [ocrCode, qrCode] = await Promise.all([ocrPromise, qrPromise]);
+        
+        // 0순위: 수학적 디코딩 (QR 최우선)
         if (qrCode && qrCode.startsWith('MT:')) {
             currentVerifiedMt = qrCode;
             document.getElementById('devMtPayload').value = qrCode;
             document.getElementById('displayMtPayload').value = qrCode;
             document.getElementById('qrStatusIcon').classList.remove('hidden');
+            
             const decoded = decodeMatterPayload(qrCode);
             applyDecodedInfo(decoded);
+            
+            // 수학적 디코딩으로 11자리 코드가 완벽히 추출되었다면 여기서 즉시 종료
             if (decoded && decoded.manualCode) {
                 handleInput(decoded.manualCode);
-                showToast("QR 디지털 코드 추출 성공");
+                showToast("초고속 수학적 분석 완료!");
+                return; // Early Return: AI 호출 차단
             }
         }
 
-        // Fallback: If QR didn't fill the 11-digit pairing code, try OCR
-        const devPayload = document.getElementById('devPayload');
-        if ((!devPayload || !devPayload.value) && ocrCode) {
+        // 1순위: 로컬 OCR 백업
+        if (ocrCode) {
             handleInput(ocrCode);
+            showToast("로컬 OCR 분석 완료!");
+            return; // Early Return: AI 호출 차단
         }
-        if (ocrCode || qrCode) showToast("분석 성공!"); else showToast("인식 정보 없음");
+
+        // 2순위: 지능형 분석 (최후의 Fallback)
+        // 위에서 return 되지 않았다면(QR/OCR 모두 실패), 이미지를 Base64로 변환 후 AI 호출
+        showToast("정밀 분석 필요 (AI 가동)...");
+        const resizedDataUrl = await resizeImage(processedFile, 1024);
+        const base64Data = resizedDataUrl.split(',')[1];
+        executeAiAnalysis(base64Data);
+
     } catch (e) { 
         showToast("분석 오류"); 
     } finally {
