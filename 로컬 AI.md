@@ -1,39 +1,4 @@
-HA 버전(_HA 폴더) 단일 스크립트 기반 로컬 LLM 전환 계획
-사용자님의 지적대로 다른 폴더(_web)나 과거 기억을 배제하고, 오직 현재 목표인 D:\Antigravity\QR manager\matter_code_vault _HA\matter_code_vault\public\script.js 파일 자체를 뜯어고치는 계획을 세웠습니다.
 
-현재 HA 애드온 버전은 무결성 검사 때문에 모듈화(여러 파일로 쪼개기)를 적용하기 어렵습니다. 따라서 67KB짜리 단일 script.js 파일 내에서 기존 구글 Gemini 코드를 걷어내고, 요청하신 로컬 Ollama 환경으로 완벽히 교체합니다.
-
-User Review Required
-IMPORTANT
-
-기존 askGemini 함수와 Google API 관련 코드를 모두 삭제하고, Ollama 전용 통신 함수(callOllama)를 단일 파일 내에 새로 작성합니다.
-옵션 연동: 기존에는 HA 애드온 설정에서 api_key를 받아와 Gemini에 썼지만, 로컬 Ollama(192.168.0.32:11434)는 API 키가 필요 없습니다. 기존의 API Key 관련 로직을 제거할지 여부를 승인해 주세요.
-계획 내용 확인 후 승인해 주시면 바로 script.js 수정을 시작하겠습니다.
-Open Questions
-AI 호스트 주소를 http://192.168.0.32:11434로 코드에 하드코딩해도 괜찮을까요? 아니면 기존 HA 애드온 옵션(config.yaml)을 수정하여 사용자가 Ollama 주소를 입력받게끔 할까요? (일단은 하드코딩으로 빠르게 가겠습니다.)
-Proposed Changes
-[MODIFY] 
-script.js
-script.js 파일에서 다음 항목들을 중점적으로 수정합니다.
-
-1. Gemini 제거 및 Ollama 통신 모듈 구축 (Keep-alive 강제)
-기존 const CURRENT_AI_MODEL = "gemini-2.5-flash-preview-09-2025"; 삭제.
-LOCAL_AI_CONFIG (moondream, antigravity-model:3b) 정의 추가.
-askGemini 함수를 삭제하고, keep_alive: "5m"이 포함된 callOllama 함수를 새로 작성하여 메모리를 스마트하게 관리합니다.
-2. QR 판독 과정 (Dual Model Workflow 적용)
-기존 executeAiAnalysis 함수를 완전히 재작성하여 두 단계를 거치게 합니다.
-
-Step 1: Vision Pass (moondream): 이미지에서 MT 코드와 11자리 숫자를 우선 추출.
-Step 2: Reasoning Pass (antigravity-model:3b) 및 V3 오타 교정: Step 1 결과와 장소(Location)를 조합해 V3 프롬프트("플립스 섹서 -> Philips 센서" 등 명백한 오타 자동 교정 및 포맷 준수)를 던져 최종 JSON 포맷을 받습니다.
-3. 무중단 폴백(Fallback) 시스템 도입
-Step 2 (antigravity-model:3b) 연산 중 타임아웃이나 오류 발생 시, 앱이 멈추거나 분석 실패 알림을 띄우는 대신 Step 1(moondream)에서 뽑은 날것의 MT 데이터라도 즉시 UI에 뿌려주도록 예외 처리(try-catch)를 견고하게 설계합니다.
-4. 부가 기능 전환
-기기명 추천(suggestDeviceName)과 AI 문답(sendAiQuery) 기능도 구글 API 대신 callOllama(antigravity-model:3b)를 타도록 프롬프트를 교체합니다.
-Verification Plan
-코드 정적 검증: script.js 내에 Gemini 관련 URL이나 변수가 완전히 사라졌는지 확인.
-동작 검증 (사고 실험):
-사용자가 QR 이미지를 올리면 executeAiAnalysis가 moondream -> antigravity-model:3b 순으로 잘 호출되는가?
-antigravity-model:3b 응답을 임의로 차단했을 때, moondream 데이터만으로 정상적으로 모달에 값이 채워지는가?
 
 
 # 🏛️ Matter Code Vault: Local AI Architecture
