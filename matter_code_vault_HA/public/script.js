@@ -1,7 +1,7 @@
 window.APP_VERSION = "5.0.4";
-window.CURRENT_AI_MODEL = "antigravity-model:3b";
+window.CURRENT_AI_MODEL = "qwen-1.5b";
 window.VISION_MODEL = "moondream";
-window.REASONING_MODEL = "antigravity-model:3b";
+window.REASONING_MODEL = "qwen-1.5b";
 window.OLLAMA_PROXY_URL = "api/ai";
 
 import './utils.js';

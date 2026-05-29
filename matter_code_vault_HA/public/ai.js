@@ -1,7 +1,7 @@
 // Constants are now managed globally in script.js
 
 async function askOllama(prompt, model, isJson = false) {
-    const targetModel = model || window.REASONING_MODEL || "antigravity-model:3b";
+    const targetModel = model || window.REASONING_MODEL || "qwen-1.5b";
     const proxyUrl = window.OLLAMA_PROXY_URL || "api/ai";
     try {
         const res = await fetch(proxyUrl, {
@@ -9,20 +9,19 @@ async function askOllama(prompt, model, isJson = false) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 model: targetModel,
-                prompt: prompt,
-                stream: false,
-                options: { temperature: 0.1, keep_alive: "5m" }
+                messages: [{ role: "user", content: prompt }],
+                temperature: 0.1
             })
         });
         const data = await res.json();
-        let text = data.response || "";
+        let text = data.choices?.[0]?.message?.content || "";
         if (isJson) {
             const jsonMatch = text.match(/\{[\s\S]*\}/);
             return jsonMatch ? JSON.parse(jsonMatch[0]) : null;
         }
         return text;
     } catch (e) {
-        console.error("Ollama Error:", e);
+        console.error("AI Error:", e);
         showToast("AI 요청 실패");
         return null;
     }

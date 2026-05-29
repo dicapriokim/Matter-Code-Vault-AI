@@ -143,23 +143,19 @@ app.post('/api/ai', async (req, res) => {
         }
     }
 
-    const OLLAMA_SERVER_URL = `http://${ollamaIp}:11434/api/generate`;
+    const LOCALAI_SERVER_URL = `http://${ollamaIp}:8080/v1/chat/completions`;
     console.log(`[AI Proxy] Request received. Model: ${req.body.model}`);
     
     try {
         const payload = {
-            ...req.body,
-            options: {
-                ...(req.body.options || {}),
-                keep_alive: "5m"
-            }
+            ...req.body
         };
 
         // Node 18 fetch with AbortController for timeout
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 60000); // 60s timeout
 
-        const response = await fetch(OLLAMA_SERVER_URL, {
+        const response = await fetch(LOCALAI_SERVER_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
@@ -170,8 +166,8 @@ app.post('/api/ai', async (req, res) => {
 
         if (!response.ok) {
             const errorText = await response.text();
-            console.error(`[AI Proxy] Ollama error (${response.status}):`, errorText);
-            throw new Error(`Ollama responded with ${response.status}`);
+            console.error(`[AI Proxy] LocalAI error (${response.status}):`, errorText);
+            throw new Error(`LocalAI responded with ${response.status}`);
         }
 
         const data = await response.json();

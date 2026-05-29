@@ -230,14 +230,20 @@ async function executeAiAnalysis(base64Data) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 model: VISION_MODEL,
-                prompt: "Describe all visible Matter QR codes (starting with MT:) and 11-digit pairing codes in this image. Be precise. Pay close attention to slashed zeros '0' which are often misread as '8'.",
-                images: [base64Data],
-                stream: false,
-                options: { keep_alive: "5m" }
+                messages: [
+                    {
+                        role: "user",
+                        content: [
+                            { type: "text", text: "Describe all visible Matter QR codes (starting with MT:) and 11-digit pairing codes in this image. Be precise. Pay close attention to slashed zeros '0' which are often misread as '8'." },
+                            { type: "image_url", image_url: { url: `data:image/jpeg;base64,${base64Data}` } }
+                        ]
+                    }
+                ],
+                temperature: 0.1
             })
         });
         const visionData = await visionRes.json();
-        const visionText = visionData.response;
+        const visionText = visionData.choices?.[0]?.message?.content || "";
 
         // Step 2: Reasoning Pass (Qwen2.5)
         const reasoningRes = await fetch(OLLAMA_PROXY_URL, {
@@ -245,14 +251,17 @@ async function executeAiAnalysis(base64Data) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 model: REASONING_MODEL,
-                prompt: `Based on the description, extract the Matter QR and the 11-digit code as strict JSON { "mt": "MT:...", "code": "xxxx-xxx-xxxx" }. Rule: Slashed zeros MUST be transcribed as the digit '0'. Output EXACTLY 11 digits for the code. Do NOT add any notes, explanations, or extra text. Description: ${visionText}`,
-                stream: false,
-                format: "json",
-                options: { temperature: 0.1, keep_alive: "5m" }
+                messages: [
+                    {
+                        role: "user",
+                        content: `Based on the description, extract the Matter QR and the 11-digit code as strict JSON { "mt": "MT:...", "code": "xxxx-xxx-xxxx" }. Rule: Slashed zeros MUST be transcribed as the digit '0'. Output EXACTLY 11 digits for the code. Do NOT add any notes, explanations, or extra text. Description: ${visionText}`
+                    }
+                ],
+                temperature: 0.1
             })
         });
         const reasoningData = await reasoningRes.json();
-        const info = JSON.parse(reasoningData.response);
+        const info = JSON.parse(reasoningData.choices?.[0]?.message?.content || "{}");
 
         // --- Algorithmic Voting: Cross-Validation for Slashed Zeros (v3.3.2) ---
         const existingInput = document.getElementById('devPayload');
