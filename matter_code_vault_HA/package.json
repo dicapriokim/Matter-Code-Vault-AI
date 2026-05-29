@@ -1,7 +1,7 @@
 {
   "name": "matter-code-vault",
-  "version": "5.0.4",
-  "description": "Matter Code Vault - Official Release",
+  "version": "5.1.0",
+  "description": "Matter Code Vault AI - Official Release",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"

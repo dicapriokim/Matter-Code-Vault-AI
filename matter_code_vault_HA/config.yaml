@@ -1,8 +1,8 @@
-name: "Matter Code Vault"
-version: "5.0.4"
+name: "Matter Code Vault AI"
+version: "5.1.0"
 slug: "matter_code_vault"
 description: "Matter 기기 관리 및 QR 코드 백업/복원 도구입니다."
-url: "https://github.com/dicapriokim/Matter-Code-Vault-v5.git"
+url: "https://github.com/dicapriokim/https-github.com-dicapriokim-Matter_QR_localAI.git"
 startup: application
 arch:
   - aarch64
@@ -15,7 +15,7 @@ map:
   - config:rw
   - share:rw
 options:
-  ollama_ip: "192.168.0.32"
+  ollama_ip: "192.168.0.33"
 schema:
   ollama_ip: str
 # image: "matter-code-vault-{arch}"

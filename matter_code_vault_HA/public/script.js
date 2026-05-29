@@ -98,7 +98,7 @@ async function loadData() {
                     window.APP_VERSION = addonConfig.version;
                     // Update UI Version Displays
                     document.querySelectorAll('.app-version').forEach(el => el.textContent = 'v' + window.APP_VERSION);
-                    document.title = `Matter Code Vault v${window.APP_VERSION}`;
+                    document.title = `Matter Code Vault AI v${window.APP_VERSION}`;
                 }
             }
         } catch (configErr) {
@@ -175,7 +175,7 @@ function _verify() {
 
 function updateVersionDisplay() {
     const footerEl = document.getElementById('versionInfoFooter');
-    if (footerEl) footerEl.textContent = `© 2026 Matter Code Vault | Designed by 돼지지렁이 v.${APP_VERSION}`;
+    if (footerEl) footerEl.textContent = `© 2026 Matter Code Vault AI | Designed by 돼지지렁이 v.${APP_VERSION}`;
 }
 
 function setupEventListeners() {

@@ -63,7 +63,7 @@ const isProd = fs.existsSync(DATA_DIR);
 const dataPath = isProd ? DATA_FILE : LOCAL_DATA_FILE;
 const configPath = isProd ? CONFIG_FILE : LOCAL_CONFIG_FILE;
 
-console.log(`Starting Matter Code Vault Server...`);
+console.log(`Starting Matter Code Vault AI Server...`);
 console.log(`Environment: ${isProd ? 'Production (HA)' : 'Development'}`);
 console.log(`Data Path: ${dataPath}`);
 

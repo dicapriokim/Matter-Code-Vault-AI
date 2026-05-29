@@ -1,12 +1,12 @@
 
 
 
-# 🏛️ Matter Code Vault: Local AI Architecture
+# 🏛️ Matter Code Vault AI: Local AI Architecture
 **Status**: 🟢 모듈화 리팩토링 완료 & 로컬 AI 전환 시공 중
 **Architect**: 안티그라비티 설계자
 
 > [!ABSTRACT] 프로젝트 개요
-> 기존 단일 파일(Monolithic) 구조의 Matter Code Vault를 현대적인 모듈형 웹 애플리케이션으로 리팩토링하고, 의존성이 높은 외부 API(Google Gemini)를 제거하여 **Intel N95 로컬 서버 기반의 독립형 AI 비전 시스템**으로 전환하는 프로젝트입니다.
+> 기존 단일 파일(Monolithic) 구조의 Matter Code Vault AI를 현대적인 모듈형 웹 애플리케이션으로 리팩토링하고, 의존성이 높은 외부 API(Google Gemini)를 제거하여 **Intel N95 로컬 서버 기반의 독립형 AI 비전 시스템**으로 전환하는 프로젝트입니다.
 
 ---
 
@@ -23,7 +23,7 @@
 
 ## 🏗️ AI 파이프라인 아키텍처
 
-Matter Code Vault는 클라이언트 자원과 서버 자원을 효율적으로 분배하는 **하이브리드 듀얼 모델 구조**를 채택합니다.
+Matter Code Vault AI는 클라이언트 자원과 서버 자원을 효율적으로 분배하는 **하이브리드 듀얼 모델 구조**를 채택합니다.
 
 ### 1단계: Client-Side OCR (Fast Pass)
 - **도구**: `Tesseract.js`

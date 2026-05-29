@@ -20,7 +20,7 @@ const readmePath = path.join(__dirname, 'README.md');
 let readmeContent = fs.readFileSync(readmePath, 'utf8');
 
 // Title & Subtitle
-readmeContent = readmeContent.replace(/# Matter Code Vault.* \(v.*\)/g, `# Matter Code Vault (v${version})`);
+readmeContent = readmeContent.replace(/# Matter Code Vault.* \(v.*\)/g, `# Matter Code Vault AI (v${version})`);
 readmeContent = readmeContent.replace(/> Matter Device Management & QR Code Backup\/Restore Tool \(v.*\)/g, `> Matter Device Management & QR Code Backup/Restore Tool (v${version})`);
 
 // Guide Section
@@ -36,7 +36,7 @@ console.log('✔ README.md updated.');
 const indexPath = path.join(__dirname, 'matter_code_vault_HA', 'public', 'index.html');
 let indexContent = fs.readFileSync(indexPath, 'utf8');
 // Though we use .app-version placeholders, we keep the <title> tag updated as well
-indexContent = indexContent.replace(/<title>Matter Code Vault.*<\/title>/, `<title>Matter Code Vault v${version}</title>`);
+indexContent = indexContent.replace(/<title>Matter Code Vault.*<\/title>/, `<title>Matter Code Vault AI v${version}</title>`);
 fs.writeFileSync(indexPath, indexContent);
 console.log('✔ index.html title updated.');
 

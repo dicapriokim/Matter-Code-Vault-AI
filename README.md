@@ -1,6 +1,6 @@
-# Matter Code Vault (v5.0.4)
+# Matter Code Vault AI (v5.1.0)
 
-> Matter Device Management & QR Code Backup/Restore Tool (v5.0.4)
+> Matter Device Management & QR Code Backup/Restore Tool (v5.1.0)
 
 Matter Code Vault is a powerful Home Assistant add-on designed for seamless Matter device management. Securely back up complex pairing codes and QR codes, and manage them intelligently using AI-driven features.
 
@@ -36,7 +36,7 @@ https://github.com/dicapriokim/Matter-Code-Vault-v5.git
 
 ---
 
-## 📖 Quick Start Guide (v5.0.4)
+## 📖 Quick Start Guide (v5.1.0)
 
 ### 1. Initial Setup
 Before adding devices, configure your ecosystem in the **[Settings ⚙️]** menu to ensure data consistency:
@@ -170,7 +170,7 @@ _다운로드가 완료되고 `>>>` 프롬프트가 나타나면 "안녕" 등을
 
 ---
 
-Designed by **돼지지렁이 (PigWorm)** v.5.0.4
+Designed by **돼지지렁이 (PigWorm)** v.5.1.0
 
 ### 📄 라이선스 (License)
 이 프로젝트는 **MIT 라이선스** 하에 배포됩니다.  
