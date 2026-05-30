@@ -1,4 +1,4 @@
-# Matter Code Vault AI v5.1.7 사용 가이드
+# Matter Code Vault AI v5.1.9 사용 가이드
 
 ## 1. 시작하기 (Setup)
 Matter Code Vault AI를 처음 사용할 때 가장 먼저 해야 할 일은 '분류 체계'를 잡는 것입니다.
@@ -63,4 +63,4 @@ Matter 표준에는 각 제조사별로 고유한 Vendor ID(VID)가 할당되어
 3. **무결성 검증**: 앱 실행 시 코드 무결성을 검증합니다. `Unauthorized modification detected` 경고가 뜨면 앱을 재설치하거나 개발자에게 문의하세요.
 
 ---
-**Designed by 돼지지렁이** v.5.1.7
+**Designed by 돼지지렁이** v.5.1.9

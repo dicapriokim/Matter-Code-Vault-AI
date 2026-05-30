@@ -671,12 +671,79 @@ function closeImageViewer() {
     if (lastBlobUrl) { URL.revokeObjectURL(lastBlobUrl); window.lastBlobUrl = null; }
 }
 
+function escapeHtml(str) {
+    if (!str) return '';
+    return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
 function confirmDelete(id) {
-    if (confirm("삭제하시겠습니까?")) {
-        window.devices = devices.filter(d => String(d.id) !== String(id));
-        saveData();
-        renderDevices();
+    const d = devices.find(x => String(x.id) === String(id));
+    if (!d) return;
+    
+    const deleteModal = document.getElementById('deleteModal');
+    const deleteMsg = document.getElementById('deleteModalMessage');
+    const confirmBtn = document.getElementById('confirmDeleteBtn');
+    
+    if (deleteModal && deleteMsg && confirmBtn) {
+        deleteMsg.innerHTML = `기기 <strong class="text-red-500 font-bold">[${escapeHtml(d.name)}]</strong>을(를)<br>삭제하시겠습니까?`;
+        
+        // 이전 이벤트 리스너 제거 후 새로 바인딩 (이벤트 누적 방지)
+        const newConfirmBtn = confirmBtn.cloneNode(true);
+        confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+        
+        newConfirmBtn.addEventListener('click', () => {
+            window.devices = devices.filter(x => String(x.id) !== String(id));
+            saveData();
+            renderDevices();
+            closeDeleteModal();
+        });
+        
+        deleteModal.classList.remove('hidden');
+    } else {
+        // Fallback
+        if (confirm(`기기 [${d.name}]을(를) 삭제하시겠습니까?`)) {
+            window.devices = devices.filter(x => String(x.id) !== String(id));
+            saveData();
+            renderDevices();
+        }
     }
+}
+
+function closeDeleteModal() {
+    const deleteModal = document.getElementById('deleteModal');
+    if (deleteModal) {
+        deleteModal.classList.add('hidden');
+    }
+}
+
+function handleSearchInput() {
+    const searchInput = document.getElementById('searchInput');
+    const clearBtn = document.getElementById('searchClearBtn');
+    if (searchInput && clearBtn) {
+        if (searchInput.value.trim().length > 0) {
+            clearBtn.classList.remove('hidden');
+        } else {
+            clearBtn.classList.add('hidden');
+        }
+    }
+    renderDevices();
+}
+
+function clearSearchInput() {
+    const searchInput = document.getElementById('searchInput');
+    const clearBtn = document.getElementById('searchClearBtn');
+    if (searchInput) {
+        searchInput.value = '';
+    }
+    if (clearBtn) {
+        clearBtn.classList.add('hidden');
+    }
+    renderDevices();
 }
 
 function toggleViewMode() { window.viewMode = window.viewMode === 'grid' ? 'list' : 'grid'; updateViewToggleButton(); renderDevices(); }
@@ -688,20 +755,61 @@ async function exportData() {
 }
 function importData(event) {
     const file = event.target.files[0];
+    if (!file) return;
     const reader = new FileReader();
     reader.onload = async (e) => {
         try {
             const imported = JSON.parse(e.target.result);
             // Support legacy array format
             const impDevices = Array.isArray(imported) ? imported : (imported.devices || []);
-            let added = 0; let updated = 0;
+            let added = 0; let updated = 0; let skipped = 0;
 
             if (impDevices.length > 0) {
+                let tempDevices = [...devices];
+
                 impDevices.forEach(item => {
-                    const idx = devices.findIndex(d => d.id === item.id);
-                    if (idx > -1) { devices[idx] = item; updated++; }
-                    else { devices.unshift(item); added++; }
+                    if (!item || !item.name || !item.payload) {
+                        skipped++;
+                        return;
+                    }
+
+                    const cleanPayload = item.payload ? item.payload.replace(/-/g, '') : '';
+                    const cleanMt = item.mtPayload ? item.mtPayload.trim() : '';
+
+                    const idx = tempDevices.findIndex(d => String(d.id) === String(item.id));
+                    const otherDevices = idx > -1
+                        ? tempDevices.filter(d => String(d.id) !== String(item.id))
+                        : tempDevices;
+
+                    let qrDuplicate = false;
+                    let codeDuplicate = false;
+
+                    for (const d of otherDevices) {
+                        const dCleanPayload = d.payload ? d.payload.replace(/-/g, '') : '';
+                        const dCleanMt = d.mtPayload ? d.mtPayload.trim() : '';
+
+                        const matchesQr = !!(cleanMt && dCleanMt && cleanMt === dCleanMt);
+                        const matchesCode = !!(cleanPayload && dCleanPayload && cleanPayload === dCleanPayload);
+
+                        if (matchesQr) qrDuplicate = true;
+                        if (matchesCode) codeDuplicate = true;
+                    }
+
+                    if (qrDuplicate || codeDuplicate) {
+                        skipped++;
+                        return;
+                    }
+
+                    if (idx > -1) {
+                        tempDevices[idx] = item;
+                        updated++;
+                    } else {
+                        tempDevices.unshift(item);
+                        added++;
+                    }
                 });
+
+                window.devices = tempDevices;
 
                 if (!Array.isArray(imported) && imported.settings) {
                     window.configs = { ...configs, ...imported.settings };
@@ -711,7 +819,9 @@ function importData(event) {
 
                 renderLocationTags(); renderManufacturerTags(); renderPlatformTags(); renderDeviceTypeTags(); renderVidMappings();
                 renderDevices();
-                showToast(`복구 완료 (기기: ${added}추가/${updated}수정)`);
+                showToast(`복구 완료 (기기: ${added}추가/${updated}수정/${skipped}중복 무시)`);
+            } else {
+                showToast("복구할 기기가 없습니다.");
             }
         } catch (err) { showToast("형식 오류: " + err.message); }
     };
@@ -823,3 +933,13 @@ window.toggleLocationFilter = typeof toggleLocationFilter !== 'undefined' ? togg
 if(typeof window.app !== 'undefined') window.app.toggleLocationFilter = window.toggleLocationFilter;
 window.getJosa = typeof getJosa !== 'undefined' ? getJosa : window.getJosa;
 if(typeof window.app !== 'undefined') window.app.getJosa = window.getJosa;
+
+window.closeDeleteModal = typeof closeDeleteModal !== 'undefined' ? closeDeleteModal : window.closeDeleteModal;
+if(typeof window.app !== 'undefined') window.app.closeDeleteModal = window.closeDeleteModal;
+
+window.handleSearchInput = typeof handleSearchInput !== 'undefined' ? handleSearchInput : window.handleSearchInput;
+if(typeof window.app !== 'undefined') window.app.handleSearchInput = window.handleSearchInput;
+
+window.clearSearchInput = typeof clearSearchInput !== 'undefined' ? clearSearchInput : window.clearSearchInput;
+if(typeof window.app !== 'undefined') window.app.clearSearchInput = window.clearSearchInput;
+
