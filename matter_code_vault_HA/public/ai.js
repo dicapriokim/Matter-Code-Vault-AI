@@ -108,14 +108,19 @@ async function suggestDeviceName() {
         const model = window.REASONING_MODEL || "qwen-3b";
         const suggestion = await askLocalAI(prompt, model, false);
         
-        if (suggestion && nameInput) { 
-            console.log("[AI-Naming] Success:", suggestion);
-            nameInput.value = suggestion.trim(); 
-            showToast("이름이 추천되었습니다!"); 
+        if (suggestion !== null) {
+            if (suggestion.trim() && nameInput) { 
+                console.log("[AI-Naming] Success:", suggestion);
+                nameInput.value = suggestion.trim(); 
+                showToast("이름이 추천되었습니다!"); 
+            } else {
+                console.error("[AI-Naming] Empty response from AI.");
+                showToast("AI가 답변을 하지 못했습니다. 다시 시도해주세요.");
+                if(nameInput) nameInput.placeholder = "예: 거실 천장 조명";
+            }
         } else {
-            console.error("[AI-Naming] No response from AI.");
-            showToast("AI가 답변을 하지 못했습니다. 다시 시도해주세요.");
-            if(nameInput) nameInput.placeholder = "예: 거실 천장 조명";
+            // Specific error toast was already shown by askLocalAI
+            if(nameInput) nameInput.placeholder = "오류 발생 (로그를 확인하세요)";
         }
     } catch (err) {
         console.error("[AI-Naming] Error:", err);
