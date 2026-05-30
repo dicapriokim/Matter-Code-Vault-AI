@@ -4,7 +4,7 @@
 * **이전 세션 대화 ID:** `fbc3ac48-6cdb-4b36-be70-ffef57f8a1d5`
 * **현재 세션 대화 ID:** `fffcaf84-f7a9-4934-81d4-5a8bef3fc61d`
 * **마이그레이션 목표:** Ollama ➡️ LocalAI (OpenAI 호환 API 규격 / `qwen-1.5b` & `moondream` 모델)
-* **2단계 완료 상태:** **Matter QR AI (`Matter-Code-Vault-v5-master`) 마이그레이션 코드 시공, 로컬 연동 검증, 명칭 변경(Matter Code Vault AI) 및 신규 깃허브 배포(v5.1.3) 완료. 추가적으로 장소-카테고리 필터 교집합 연동 및 동적 한글 조사 매칭 빈 화면 안내 메시지 기능(emptyStateText), 그리고 자동 버전업(0.0.1 패치 증가) 및 일괄 동기화(sync-version.js) 고도화 탑재 완료. 최종적으로 Verhoeff 체크섬 기반의 지능형 오인식 자동 복구 필터 및 3단계 AI 강제 진입 완전 자동화 스캔 파이프라인 시공 및 카메라 스캔 안정화 지연 기능 탑재 완료.**
+* **2단계 완료 상태:** **Matter QR AI (`Matter-Code-Vault-v5-master`) 마이그레이션 코드 시공, 로컬 연동 검증, 명칭 변경(Matter Code Vault AI) 및 신규 깃허브 배포(v5.1.4) 완료. 추가적으로 장소-카테고리 필터 교집합 연동 및 동적 한글 조사 매칭 빈 화면 안내 메시지 기능(emptyStateText), 그리고 자동 버전업(0.0.1 패치 증가) 및 일괄 동기화(sync-version.js) 고도화 탑재 완료. 최종적으로 Verhoeff 체크섬 기반의 지능형 오인식 자동 복구 필터 및 3단계 AI 강제 진입 완전 자동화 스캔 파이프라인 시공 및 카메라 스캔 안정화 지연 기능, 그리고 신규 깃 리모트 저장소 연동 완료.**
 
 ---
 
@@ -25,7 +25,7 @@
   - [script.js](file:///d:/Antigravity/QR%20manager/Matter-Code-Vault-v5-master/matter_code_vault_HA/public/script.js)와 [ai.js](file:///d:/Antigravity/QR%20manager/Matter-Code-Vault-v5-master/matter_code_vault_HA/public/ai.js)의 기본 연동 상수를 `qwen-1.5b`로 교체 완료.
   - 로컬 `8099` 포트로 Express 서버 임시 구동 완료 및 `192.168.0.33` LocalAI 연동 작명 API 테스트 성공 확인.
 * **신규 깃허브 원격 배포 성공:**
-  - 원격 리포지토리 URL을 `https://github.com/dicapriokim/https-github.com-dicapriokim-Matter_QR_localAI.git`로 변경 완료.
+  - 원격 리포지토리 URL을 `https://github.com/dicapriokim/Matter-Code-Vault-AI.git`로 변경 완료.
   - 검증 완료된 master 브랜치 소스코드를 신규 깃허브 저장소로 최종 푸쉬(git push origin master) 성공 완료.
 * **장소 및 카테고리 필터 교집합 연동 및 동적 안내 문구 고도화 완료:**
   - `activeLocation` 필터가 `activeCategory`와 교집합(`&&`)으로 결합되어 기기 리스트가 올바르게 렌더링되도록 수정함.
@@ -35,7 +35,7 @@
 * **자동 버전 증가 및 동기화 도구 고도화 완료:**
   - `sync-version.js`를 개편하여 실행 시 기본적으로 `package.json`의 버전을 0.0.1 자동으로 올리도록 설계함 (`--no-bump` 옵션으로 버전 업 방지 기능 탑재).
   - 버전이 증가되면 `package-lock.json`, `config.yaml`, `README.md`, `DOCS.md`, `index.html`, `script.js`, `run.sh` 내부의 하드코딩된 버전 정보들을 일괄 자동으로 갱신(동기화)해주어 배포 시 업데이트 인식이 누락 없이 진행되도록 연동 완료.
-  - 최종 5.1.3 버전업 및 원격 push 완료.
+  - 최종 5.1.4 버전업 및 신규 원격 저장소(`https://github.com/dicapriokim/Matter-Code-Vault-AI.git`) 연동 push 완료.
 * **Verhoeff 체크섬 기반의 지능형 오인식 자동 복구 필터 구축 완료:**
   - 11자리 설정 코드의 무결성을 수학적으로 보증하는 Verhoeff 알고리즘 검증 함수(`validateVerhoeff`)를 추가함.
   - 로컬 OCR이 오인식했을 때(체크섬 불일치 시) 조기 리턴을 원천 차단하고 3단계 AI 분석으로 강제 하강하도록 스캔 파이프라인 흐름을 전면 개선함.
