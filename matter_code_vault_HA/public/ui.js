@@ -300,10 +300,16 @@ function renderDevices() {
         if (!configs.locationOrder.includes(l)) configs.locationOrder.push(l);
     });
 
+    const cleanQuery = query.replace(/-/g, '');
+
     const devicesToRender = devices.filter(d => {
+        const cleanPayload = d.payload ? d.payload.replace(/-/g, '') : '';
         const matchesSearch = d.name.toLowerCase().includes(query) || d.location.toLowerCase().includes(query) ||
             (d.manufacturer && d.manufacturer.toLowerCase().includes(query)) ||
-            (d.platform && d.platform.toLowerCase().includes(query)) || (d.type && d.type.toLowerCase().includes(query));
+            (d.platform && d.platform.toLowerCase().includes(query)) || (d.type && d.type.toLowerCase().includes(query)) ||
+            (d.mtPayload && d.mtPayload.toLowerCase().includes(query)) || (d.payload && d.payload.toLowerCase().includes(query)) ||
+            (cleanPayload && cleanPayload.toLowerCase().includes(cleanQuery));
+
         const matchesCategory = window.activeCategory === 'All' || d.type === activeCategory;
         const matchesLocation = window.activeLocation === 'All' || d.location === window.activeLocation;
         return matchesSearch && matchesCategory && matchesLocation;
