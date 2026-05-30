@@ -4,8 +4,7 @@
 * **이전 세션 대화 ID:** `fbc3ac48-6cdb-4b36-be70-ffef57f8a1d5`
 * **현재 세션 대화 ID:** `fffcaf84-f7a9-4934-81d4-5a8bef3fc61d`
 * **마이그레이션 목표:** Ollama ➡️ LocalAI (OpenAI 호환 API 규격 / `qwen-1.5b` & `moondream` 모델)
-* **1단계 완료 상태:** **Mail-Automator (`Mail-Automator_gemma4`) 전환 및 검증 성공 완료**
-* **2단계 완료 상태:** **Matter QR AI (`Matter-Code-Vault-v5-master`) 마이그레이션 코드 시공, 로컬 연동 검증, 명칭 변경(Matter Code Vault AI) 및 신규 깃허브 배포(v5.1.0) 완료**
+* **2단계 완료 상태:** **Matter QR AI (`Matter-Code-Vault-v5-master`) 마이그레이션 코드 시공, 로컬 연동 검증, 명칭 변경(Matter Code Vault AI) 및 신규 깃허브 배포(v5.1.0) 완료. 추가적으로 장소-카테고리 필터 교집합 연동 및 동적 한글 조사 매칭 빈 화면 안내 메시지 기능(emptyStateText) 탑재 완료**
 
 ---
 
@@ -28,11 +27,15 @@
 * **신규 깃허브 원격 배포 성공:**
   - 원격 리포지토리 URL을 `https://github.com/dicapriokim/https-github.com-dicapriokim-Matter_QR_localAI.git`로 변경 완료.
   - 검증 완료된 master 브랜치 소스코드를 신규 깃허브 저장소로 최종 푸쉬(git push origin master) 성공 완료.
+* **장소 및 카테고리 필터 교집합 연동 및 동적 안내 문구 고도화 완료:**
+  - `activeLocation` 필터가 `activeCategory`와 교집합(`&&`)으로 결합되어 기기 리스트가 올바르게 렌더링되도록 수정함.
+  - 선택한 장소 버튼이 활성화(주황색 테두리 등) 시각 효과를 내도록 조건부 스타일 적용.
+  - `emptyStateText`를 추가하여 장소 및 카테고리 조합 결과 기기가 없을 시 한국어 조사 매칭(`getJosa`)을 통해 `"[장소]에는 [카테고리]가 없습니다."` 등의 자연스러운 맞춤형 안내가 동적 노출되도록 개선함.
+  - 깃허브 배포 승인을 득하여 원격 push 완료.
 
 ### 2. 남은 과제 (Next steps)
 * **2단계 종료 선언 대기 및 최종 카메라 테스트:**
   - 사용자가 애드온을 통해 실물 카메라 스캔 테스트를 최종 진행 및 완료한 뒤 **"2단계 종료"** 지침을 내릴 때까지 대기.
-  - 버전 v5.1.0 버전업 및 프로젝트 공식 명칭 "Matter Code Vault AI"로 변경 반영 성공 완료.
 * **3단계 진행 수칙:**
   - 사용자로부터 명시적으로 **"2단계 종료"** 지침을 받기 전까지는 3단계 마이그레이션(HA_MCP)에 대한 언급을 절대 하지 말 것.
 
