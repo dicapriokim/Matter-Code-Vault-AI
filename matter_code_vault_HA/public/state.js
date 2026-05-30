@@ -7,7 +7,7 @@
 // --- LOCAL AI CONFIG ---
 export const LOCAL_AI_BASE_URL = "http://127.0.0.1:8080";
 export const LOCAL_AI_CONFIG = {
-    reasoning: { model: "antigravity-model", role: "뇌 (Brain) — 데이터 정제, 오타 교정, 지능형 작명" },
+    reasoning: { model: "qwen-3b", role: "뇌 (Brain) — 데이터 정제, 오타 교정, 지능형 작명" },
     keepAlive: "5m",
     timeout: 120000 
 };

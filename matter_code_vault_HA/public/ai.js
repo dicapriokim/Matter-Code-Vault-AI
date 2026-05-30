@@ -1,7 +1,7 @@
 // Constants are now managed globally in script.js
 
 async function askLocalAI(prompt, model, isJson = false) {
-    const targetModel = model || window.REASONING_MODEL || "qwen-1.5b";
+    const targetModel = model || window.REASONING_MODEL || "qwen-3b";
     const proxyUrl = window.AI_PROXY_URL || "api/ai";
     try {
         const res = await fetch(proxyUrl, {
@@ -52,7 +52,7 @@ async function sendAiQuery() {
     input.value = '';
 
     const systemInstruction = "너는 스마트홈, IoT, Matter 표준 전문 AI 어시스턴트야. 별도의 언급이 없더라도 모든 답변은 스마트홈, 홈 자동화, IoT 기기 맥락에서 전문적으로 답변해줘. 브랜드명(예: 아카라, 필립스 휴 등)은 일반 명사가 아닌 IoT 제품 브랜드로 인식해야 해. ";
-    const model = window.REASONING_MODEL || "antigravity-model:3b";
+    const model = window.REASONING_MODEL || "qwen-3b";
     const response = await askLocalAI(systemInstruction + query, model, false);
 
     const loadingEl = document.getElementById(loadingId);
@@ -88,7 +88,7 @@ async function suggestDeviceName() {
         const prompt = `Matter 기기 이름을 한국어로 간결하게 추천해줘. 제조사: ${manufacturer}, 기기 종류: ${type}, 설치 장소: ${location || '미지정'}. 결과만 텍스트로 출력.`;
 
         console.log("[AI-Naming] Requesting suggestion for:", { manufacturer, type, location });
-        const model = window.REASONING_MODEL || "antigravity-model:3b";
+        const model = window.REASONING_MODEL || "qwen-3b";
         const suggestion = await askLocalAI(prompt, model, false);
         
         if (suggestion && nameInput) { 
