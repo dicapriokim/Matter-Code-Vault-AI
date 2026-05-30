@@ -13,7 +13,24 @@ async function askLocalAI(prompt, model, isJson = false) {
                 temperature: 0.1
             })
         });
+        
+        if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            const errMsg = errData.error || `HTTP ${res.status}`;
+            console.error("AI Proxy Error:", res.status, errData);
+            showToast(`AI 오류: ${errMsg}`);
+            return null;
+        }
+
         const data = await res.json();
+        
+        // LocalAI might return an error object inside a 200 OK response (unlikely but possible)
+        if (data.error) {
+            console.error("AI Server Error:", data.error);
+            showToast(`AI 오류: ${data.error.message || data.error}`);
+            return null;
+        }
+
         let text = data.choices?.[0]?.message?.content || "";
         if (isJson) {
             const jsonMatch = text.match(/\{[\s\S]*\}/);
@@ -22,7 +39,7 @@ async function askLocalAI(prompt, model, isJson = false) {
         return text;
     } catch (e) {
         console.error("AI Error:", e);
-        showToast("AI 요청 실패");
+        showToast("AI 네트워크 요청 실패");
         return null;
     }
 }
