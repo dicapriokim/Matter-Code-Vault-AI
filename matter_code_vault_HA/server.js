@@ -143,7 +143,8 @@ app.post('/api/ai', async (req, res) => {
         }
     }
 
-    const LOCALAI_SERVER_URL = `http://${localAiIp}:8080/v1/chat/completions`;
+    const hasPort = localAiIp.includes(':');
+    const LOCALAI_SERVER_URL = hasPort ? `http://${localAiIp}/v1/chat/completions` : `http://${localAiIp}:8080/v1/chat/completions`;
     console.log(`[AI Proxy] Request received. Model: ${req.body.model}`);
     
     try {
