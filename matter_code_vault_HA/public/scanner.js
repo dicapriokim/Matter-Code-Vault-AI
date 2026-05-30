@@ -2,20 +2,23 @@
 function triggerOcrScan() { document.getElementById('ocrInputFile').click(); }
 
 function triggerFallbackAi() {
-    const video = document.querySelector("#qr-reader video");
-    if (video) {
-        const canvas = document.createElement("canvas");
-        canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-        canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
-        canvas.toBlob(blob => {
-            resizeImage(blob, 1024).then(resizedDataUrl => {
-                const base64Data = resizedDataUrl.split(',')[1];
-                executeAiAnalysis(base64Data);
-                stopCamera();
-                document.getElementById('fallbackAiBtn').classList.add('hidden');
-            });
-        }, 'image/jpeg');
-    } else showToast("캡처 실패");
+    showToast("📸 0.3초 후 캡처 (기기를 고정해 주세요)");
+    setTimeout(() => {
+        const video = document.querySelector("#qr-reader video");
+        if (video) {
+            const canvas = document.createElement("canvas");
+            canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+            canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
+            canvas.toBlob(blob => {
+                resizeImage(blob, 1024).then(resizedDataUrl => {
+                    const base64Data = resizedDataUrl.split(',')[1];
+                    executeAiAnalysis(base64Data);
+                    stopCamera();
+                    document.getElementById('fallbackAiBtn').classList.add('hidden');
+                });
+            }, 'image/jpeg');
+        } else showToast("캡처 실패");
+    }, 300);
 }
 
 function startCamera() {
@@ -85,7 +88,15 @@ async function getTesseractWorker() {
 
 async function checkTesseractAndFallback() {
     if (!isScanning) return;
-    if (Date.now() - scanStartTime > 5000) document.getElementById('fallbackAiBtn').classList.remove('hidden');
+    
+    // 카메라 구동 후 초반 500ms(0.5초) 간은 초점 조정 및 손떨림 안정화를 위해 분석 제외
+    const elapsed = Date.now() - scanStartTime;
+    if (elapsed < 500) {
+        console.log(`[Focus Settle] Waiting for camera stabilization... (${elapsed}ms)`);
+        return;
+    }
+
+    if (elapsed > 5000) document.getElementById('fallbackAiBtn').classList.remove('hidden');
     const video = document.querySelector("#qr-reader video");
     if (!video) return;
     const canvas = document.createElement("canvas");
