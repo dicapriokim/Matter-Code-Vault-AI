@@ -1,7 +1,7 @@
 window.APP_VERSION = "5.1.20";
-window.CURRENT_AI_MODEL = "qwen-3b";
-window.VISION_MODEL = "moondream";
-window.REASONING_MODEL = "qwen-3b";
+window.CURRENT_AI_MODEL = "qwen2.5:3b";
+window.VISION_MODEL = "moondream:latest";
+window.REASONING_MODEL = "qwen2.5:3b";
 window.AI_PROXY_URL = "api/ai";
 
 import './utils.js';

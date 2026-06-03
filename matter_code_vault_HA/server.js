@@ -126,6 +126,62 @@ app.post('/api/data', (req, res) => {
         res.status(500).json({ error: "Failed to save data" });
     }
 });
+const net = require('net');
+let resolvedLocalAiUrl = null;
+
+function testTcpConnection(host, port, timeout = 300) {
+    return new Promise((resolve) => {
+        const socket = new net.Socket();
+        let status = false;
+        socket.setTimeout(timeout);
+        socket.connect(port, host, () => {
+            status = true;
+            socket.destroy();
+        });
+        socket.on('timeout', () => { socket.destroy(); });
+        socket.on('error', () => { socket.destroy(); });
+        socket.on('close', () => { resolve(status); });
+    });
+}
+
+async function scanSubnetForOllama() {
+    const promises = [];
+    for (let i = 1; i < 255; i++) {
+        const ip = `192.168.0.${i}`;
+        promises.push(
+            testTcpConnection(ip, 11434, 200).then(isOpen => isOpen ? ip : null)
+        );
+    }
+    const results = await Promise.all(promises);
+    return results.find(ip => ip !== null) || null;
+}
+
+async function getResolvedAiUrl(localAiIp) {
+    if (resolvedLocalAiUrl) return resolvedLocalAiUrl;
+    let host = localAiIp;
+    let port = 11434;
+    if (localAiIp.includes(':')) {
+        const parts = localAiIp.split(':');
+        host = parts[0];
+        port = parseInt(parts[1], 10);
+    }
+    if (await testTcpConnection(host, port, 400)) {
+        resolvedLocalAiUrl = `http://${host}:${port}/v1/chat/completions`;
+        return resolvedLocalAiUrl;
+    }
+    if (await testTcpConnection('superllm.local', 11434, 400)) {
+        console.log("[AI Proxy] Discovered Ollama at superllm.local:11434");
+        resolvedLocalAiUrl = `http://superllm.local:11434/v1/chat/completions`;
+        return resolvedLocalAiUrl;
+    }
+    const discoveredIp = await scanSubnetForOllama();
+    if (discoveredIp) {
+        console.log(`[AI Proxy] Discovered Ollama via subnet scan: ${discoveredIp}`);
+        resolvedLocalAiUrl = `http://${discoveredIp}:11434/v1/chat/completions`;
+        return resolvedLocalAiUrl;
+    }
+    return `http://${host}:${port}/v1/chat/completions`;
+}
 
 // API: AI Proxy (Forward requests to LocalAI)
 app.post('/api/ai', async (req, res) => {
@@ -143,9 +199,8 @@ app.post('/api/ai', async (req, res) => {
         }
     }
 
-    const hasPort = localAiIp.includes(':');
-    const LOCALAI_SERVER_URL = hasPort ? `http://${localAiIp}/v1/chat/completions` : `http://${localAiIp}:8080/v1/chat/completions`;
-    console.log(`[AI Proxy] Request received. Model: ${req.body.model}`);
+    const LOCALAI_SERVER_URL = await getResolvedAiUrl(localAiIp);
+    console.log(`[AI Proxy] Request received. Model: ${req.body.model} | Targeting: ${LOCALAI_SERVER_URL}`);
     
     try {
         const payload = {
@@ -175,6 +230,8 @@ app.post('/api/ai', async (req, res) => {
         console.log(`[AI Proxy] Success.`);
         res.json(data);
     } catch (e) {
+        // AI 통신 실패 시 캐시된 URL을 비워 다음 요청에서 네트워크 재탐색(스캔)을 유도합니다.
+        resolvedLocalAiUrl = null;
         const isTimeout = e.name === 'AbortError';
         console.error(`[AI Proxy] Failed:`, isTimeout ? "Timeout (60s)" : e.message);
         res.status(500).json({ 
