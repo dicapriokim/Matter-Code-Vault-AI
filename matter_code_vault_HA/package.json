@@ -1,6 +1,6 @@
 {
   "name": "matter-code-vault",
-  "version": "5.2.1",
+  "version": "5.2.2",
   "description": "Matter Code Vault AI - Official Release",
   "main": "server.js",
   "scripts": {

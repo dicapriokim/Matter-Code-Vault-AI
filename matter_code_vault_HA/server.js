@@ -209,7 +209,7 @@ app.post('/api/ai', async (req, res) => {
 
         // Node 18 fetch with AbortController for timeout
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 60000); // 60s timeout
+        const timeout = setTimeout(() => controller.abort(), 180000); // 180s timeout
 
         const response = await fetch(LOCALAI_SERVER_URL, {
             method: 'POST',
@@ -233,10 +233,10 @@ app.post('/api/ai', async (req, res) => {
         // AI 통신 실패 시 캐시된 URL을 비워 다음 요청에서 네트워크 재탐색(스캔)을 유도합니다.
         resolvedLocalAiUrl = null;
         const isTimeout = e.name === 'AbortError';
-        console.error(`[AI Proxy] Failed:`, isTimeout ? "Timeout (60s)" : e.message);
+        console.error(`[AI Proxy] Failed:`, isTimeout ? "Timeout (180s)" : e.message);
         res.status(500).json({ 
             error: "AI Proxy Failed", 
-            message: isTimeout ? "AI 요청 시간 초과 (60초)" : e.message 
+            message: isTimeout ? "AI 요청 시간 초과 (180초)" : e.message 
         });
     }
 });

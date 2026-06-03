@@ -64,3 +64,11 @@
 
 ## 🔒 보안 준수 사항 (기밀 보존)
 * `Mail-Automator_gemma4` 및 `HA_MCP` 폴더 내 `.env` 파일에 있는 모든 기밀 토큰 정보는 깃에 노출되지 않도록 철저히 보존함.
+
+---
+
+## 🚫 에이전트 전역 설정 및 실수 방지 규약 (Agent Mistake Prevention Rules)
+* **[실수 사례]**: `README.md` 문서는 새 버전으로 업데이트하여 배포했으나, `config.yaml`과 `package.json`의 버전 범프(Bump)를 누락하여 Home Assistant 애드온 스토어에서 새로운 업데이트로 인식하지 못한 실수가 있었습니다.
+* **[전역 강제 규약 (Global Rule)]**:
+  - **버전 동기화 의무**: 어떠한 기능 추가나 버그 수정 후 리포지토리에 푸쉬(배포)하기 전에는, **반드시 `config.yaml`, `package.json`, `script.js`, `index.html` 등의 버전 정보가 릴리즈 버전과 일치하는지 확인**해야 합니다.
+  - **`sync-version.js` 우선 활용**: 프로젝트 루트에 있는 `sync-version.js` 스크립트 실행 또는 이와 동일한 수준의 다중 파일 버전 동기화(multi-file replace)를 통해 파편화된 버전 넘버를 단일화한 후 푸쉬 검사관(Push Inspector)을 호출해야 합니다.

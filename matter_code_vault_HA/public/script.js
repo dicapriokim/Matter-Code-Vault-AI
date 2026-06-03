@@ -1,4 +1,4 @@
-window.APP_VERSION = "5.2.1";
+window.APP_VERSION = "5.2.2";
 window.CURRENT_AI_MODEL = "qwen2.5:3b";
 window.VISION_MODEL = "moondream:latest";
 window.REASONING_MODEL = "qwen2.5:3b";
