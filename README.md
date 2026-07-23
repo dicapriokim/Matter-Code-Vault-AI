@@ -8,155 +8,147 @@
 
 ## 🇰🇷 한국어 설명서 (Korean Version)
 
-> Matter 기기 관리 및 QR 코드 백업/복원 도구 (v5.2.2)
+> **Matter 기기 페어링 코드 & QR 전용 안전 백업/관리 Home Assistant 애드온 (v5.2.2)**
 
-Matter Code Vault는 Home Assistant 환경에서 Matter 기기를 원활하게 관리할 수 있도록 설계된 강력한 애드온입니다. 복잡한 페어링 코드와 QR 코드를 안전하게 백업하고, AI 기반 고도화 기능을 통해 스마트하게 관리하세요.
+**Matter Code Vault**는 Home Assistant(HA) 환경에서 복잡한 스마트홈 **Matter 기기의 QR 코드, 11자리 페어링 설정 코드, 기기 정보(설치 위치, 제조사, 카테고리)를 안전하게 백업 및 복원하고 열전사 라벨 프린터용 라벨을 생성해 주는 전문 관리 애드온**입니다.
 
 ---
 
-### 🚀 설치 가이드
+### 📦 주요 기능 소개
 
-이 애드온을 설치하려면 Home Assistant **애드온 스토어** > **저장소**에 아래 URL을 추가하십시오:
+1. **Matter 페어링 정보 중앙 백업 & 관리**
+   - QR 코드 이미지 스캔/업로드 및 11자리 Setup Code 안전 보관
+   - 기기별 위치(거실, 안방 등), 카테고리(조명, 센서 등), 제조사(Aqara, Eve 등) 체계적 분류
+2. **수학적 오타 자가 보정 (Verhoeff Checksum)**
+   - 카메라/OCR 스캔 시 숫자 `0`을 `6`이나 `8`로 잘못 읽는 현상을 Verhoeff 체크섬 알고리즘으로 자동 검증 및 역추적 복원
+3. **라벨 스티커 출력 지원**
+   - 열전사 라벨 프린터(PNG 내보내기)용 QR 코드 + 기기 정보 라벨 이미지 즉시 생성
+4. **완벽한 데이터 백업/복원 및 중복 검증**
+   - 전체 데이터를 `.json` 파일로 내보내기/불러오기 지원 (중복 기기 등록 차단 및 스킵 리포트 제공)
+5. **크리에이터 보안 마스킹 모드**
+   - 화면 공유나 방송 시 민감한 QR 코드 및 11자리 페어링 코드를 원클릭으로 마스킹 가림 처리
+
+---
+
+### 🚀 애드온 설치 가이드 (Installation)
+
+이 애드온을 설치하려면 Home Assistant **애드온 스토어** > **저장소**에 아래 공식 URL을 추가하십시오:
 
 ```text
-https://github.com/your-username/Matter-Code-Vault-AI.git
+https://github.com/dicapriokim/Matter-Code-Vault-AI.git
 ```
 
 1. Home Assistant에서 **설정** > **애드온** > **애드온 스토어**로 이동합니다.
 2. 우측 상단의 **메뉴**(점 3개)를 누르고 **저장소**를 선택합니다.
-3. 위의 URL을 붙여넣고 **추가**를 클릭합니다.
+3. 위의 URL(`https://github.com/dicapriokim/Matter-Code-Vault-AI.git`)을 붙여넣고 **추가**를 클릭합니다.
 4. 목록에서 **Matter Code Vault**를 찾아 **설치**를 클릭합니다.
+
+---
+
+### ⚙️ 애드온 기본 옵션 및 유의 사항
+
+- **데이터 보존 위치**: 수집된 Matter 기기 정보는 로컬 컨테이너 내 `/data/matter_data.json`에 안전하게 영구 보존됩니다. (애드온 제거 전 JSON 백업 내보내기 권장)
+- **카메라 권한**: 브라우저 보안 정책에 따라 기기 웹캠 스캔은 **HTTPS** 또는 **localhost** 접속 환경이 필수입니다. (HTTP 접속 시 '사진 업로드' 스캔 활용)
+
+---
+
+### 💡 [선택 사항] 사전 조치: 로컬 AI 연동 가이드 (Ollama)
+
+> 📌 **참고**: AI 기능이 구성되지 않은 오프라인 상태에서도 기기 등록, 11자리 코드 백업, JSON 백업/복원, 라벨 출력 등 **애드온의 모든 핵심 기능은 100% 정상 구동**됩니다.
+
+스캔 정밀 보정 및 지능형 기기 한글 작명 추천 기능을 부가적으로 활용하려는 경우, 애드온 구동 전 로컬 AI 서버가 구축되어 있어야 합니다:
+
+1. **사전 구축 가이드 (Proxmox VE LXC 환경)**
+   - Proxmox LXC 템플릿 생성부터 GPU 패스스루, Ollama 엔진 설치 및 OpenAI 호환 API 가속까지 올인원으로 구축하려면 아래 링크를 참고하세요:
+   - 👉 [**SuperLLM LXC 신규 구축 가이드 (Ollama + OpenAI)**](https://github.com/dicapriokim/LocalAI-ollama-openai)
+2. **필수 로드 모델**:
+   - **비전 분석 모델**: `moondream:latest`
+   - **텍스트/작명 모델**: `qwen2.5:3b`
+3. **애드온 설정 매핑**:
+   - HA 애드온 설정의 `local_ai_ip` 필드에 구축된 로컬 AI 서버 IP(예: `192.168.x.x`)를 직접 입력하세요. (자동 탐색 스캔 지연 방지)
 
 ---
 
 ### 🏆 공식 릴리즈 내역 (v5.2.2)
 
-- **AI 서버 응답 타임아웃 180초 연장 (v5.2.2)**: N95 등 GPU가 없는 미니PC 로컬 환경에서 거대 모델(qwen2.5:3b)의 긴 추론 답변이 끊기지 않도록 프록시 대기 시간을 60초에서 180초로 연장했습니다.
-- **AI 응답 에러 핸들링 고도화 (v5.2.1)**: AI 서버 연결 실패 및 응답 에러 발생 시 상세 에러 메시지를 포함한 시각적 경고창을 UI에 명확하게 표시하도록 개선했습니다.
-- **시스템 프롬프트 독립 전송 (v5.2.1)**: AI 프록시 요청 시 시스템 프롬프트를 별도의 'system' 역할(role)로 분리 전송하여 모델의 맥락 인식률을 극대화했습니다.
-
-- **스마트 필터 초기화 (v5.1.10)**: 첫 줄 카테고리 필터에서 'All'을 클릭할 때, 활성화되어 있던 장소 필터(주방 등)가 동시에 자동 해제 연동되어 전체 조회가 매끄럽게 복원됩니다.
-- **커스텀 삭제 확인 모달 (v5.1.9)**: 기기 삭제 시 화면 정중앙에 기기명을 표시하여 경고하는 커스텀 팝업 모달을 도입하여 오작동(휴먼 에러)을 방지합니다.
-- **검색 필드 X(지우기) 버튼 (v5.1.9)**: 검색어 입력 시 우측에 원클릭으로 내용을 지울 수 있는 동적 X 버튼이 제공되며, 클릭 시 목록이 즉시 리셋 갱신됩니다.
-- **JSON 복원 중복 검증 (v5.1.8)**: 백업된 JSON 파일을 가져오기(복원)할 때도 QR코드 및 11자리 코드를 교차 비교하여 중복 기기는 자동으로 건너뛰고 스킵 내역을 상세 보고합니다.
-- **등록 중복 차단 필터 (v5.1.7)**: 기기 추가/수정 저장 시 QR코드 및 11자리 페어링 코드를 기 등록된 목록과 교차 검증하여 3가지 시나리오별 맞춤 경고창(`alert`)으로 등록을 차단합니다.
-- **Verhoeff 체크섬 오인식 교정 (v5.1.7)**: 11자리 페어링 코드의 무결성을 수학적으로 보증하는 Verhoeff 알고리즘 검증을 기반으로 OCR 판독 왜곡(예: 0을 6/8로 오인)을 자동 교정 및 복원합니다.
-- **OCR Focus Settle 지연 가드**: 카메라 스캔 시작 안정 가드(초반 500ms 딜레이) 및 수동 캡처 시 손떨림 방지 딜레이(300ms) 기능을 적용하여 스캔 인식 정확도를 극대화했습니다.
-- **백엔드 AI 프록시**: Mixed Content 및 CORS 제한을 우회하기 위해 로컬 AI 서버(`v1/chat/completions`)로 통신을 프록싱 라우팅해주는 백엔드 보안 우회 장치를 기본 탑재했습니다.
-- **Vision & Reasoning 듀얼 파이프라인**: 지능형 기기 작명 및 스캔 정밀 보정을 위해 `moondream:latest`와 `qwen2.5:3b` 모델을 연동하여 상황 인식 연산을 실행합니다.
-- **모듈화 아키텍처**: 시스템 유지보수성과 성능 극대화를 위해 프론트 스크립트를 독립 모듈(`state.js`, `ui.js`, `ai.js`, `scanner.js`)로 최적 설계했습니다.
+- **AI 프록시 타임아웃 180초 연장 (v5.2.2)**: N95 미니 PC 등 GPU가 없는 로컬 CPU 환경에서 AI 추론 연산이 끊기지 않도록 대기 시간을 180초로 최적화.
+- **AI 응답 에러 핸들링 & 시스템 프롬프트 독립 전송 (v5.2.1)**: AI 프록시 에러 시 UI 경고창 시각화 및 맥락 인식률 극대화.
+- **Verhoeff 체크섬 오인식 교정 (v5.1.7)**: 11자리 페어링 코드 무결성 검증 및 자가 복구 파이프라인 탑재.
+- **스마트 필터 & 삭제 모달 (v5.1.9~v5.1.10)**: 필터 교집합 연동 및 안전한 삭제 확인 모달 도입.
 
 ---
-
-### 🧠 Ollama 로컬 AI 서버 구축 (AI 사전 작업)
-
-AI 기반의 OCR 오인식 교정 및 스마트 작명 추천 기능을 활용하려면, 애드온 사용 전에 로컬 AI 서버가 먼저 기동되어 있어야 합니다:
-* **Ollama 서버 구축**: 외부 클라우드 통신 없이 로컬 환경에서 OpenAI API와 동일한 규격의 엔드포인트를 제공하는 경량 자율형 AI 서버 엔진인 Ollama를 사용합니다. Proxmox VE 등 가상화 환경을 운영하는 경우 [SuperLLM LXC 신규 구축 가이드 문서](https://github.com/dicapriokim/LocalAI-miniPC)를 참고하여 고성능 경량 LXC 컨테이너로 구축할 수 있습니다.
-* **필수 모델 로드**: 구축된 Ollama 서버에 아래 두 가지 모델이 정상적으로 다운로드(pull)되어 작동하는지 확인하십시오:
-  - **텍스트 모델**: `qwen2.5:3b` (또는 추론 연산용 동급 초경량 LLM)
-  - **비전 모델**: `moondream:latest` (이미지/OCR 판독을 위한 멀티모달 비전 모델)
-
-> **참고**: AI 서버가 구성되지 않은 기본 오프라인 상태에서도 기기 수동 등록, 11자리 페어링 코드 등록, JSON 백업/복원 및 열전사 라벨 QR 프린트 등 대시보드의 핵심 기능은 완벽하게 작동합니다.
->
-> ⚠️ [필수] 신규 유저 올인원 구축 가이드
-> LXC 환경에서 처음 구축을 시작하는 분들은 헤매지 마시고 가장 먼저 아래의 올인원 구축 가이드를 순서대로 진행해 주시기 바랍니다.
->
-> Proxmox LXC 템플릿 생성부터 GPU 패스스루 설정, Ollama 엔진 설치 및 가속 최적화까지 모든 과정이 A to Z로 담겨 있습니다.
-> 👉 🖥️ SuperLLM LXC 신규 구축 가이드 문서 열기
-
----
-
-### ⚙️ 설정 안내 (AI Proxy)
-
-본 애드온은 HTTPS 환경에서도 로컬 AI 서버와 Mixed Content 제한 없이 안전하게 통신할 수 있도록 내부 **백엔드 AI 프록시**를 포함하고 있습니다.
-1. **LocalAI Server IP**: Home Assistant 애드온 설정 옵션에서 사용자의 로컬 AI 서버 IP를 설정합니다 (기본값: `192.168.x.x`). 설정하지 않으면 `superllm.local:11434` 또는 네트워크 대역에서 Ollama 서버(11434 포트)를 자동 감지합니다.
-  -  127.0.0.1로 설정(미설정으로 자동 스캔 된 경우)해서 불필요한 스캔 지연(네트워크 트래픽 및 시간 소요)을 방지하고 빠르게 응답을 받으려면, 매뉴얼의 안내대로 실제 AI 서버 주소인 192.168.x.x을 직접 입력하시는 것을 권장합니다.
-2. **필수 모델 이름**:
-   - `moondream:latest` (비전 분석 패스용)
-   - `qwen2.5:3b` (텍스트 추론/작명 패스용)
-3. **내부 라우팅**: 브라우저 보안 제약을 회피하기 위해 `api/ai` 엔드포인트를 경유하여 Ollama의 OpenAI 호환 completions API로 포워딩합니다.
-
----
-
-### ⚠️ 유의 사항
-
-- **데이터 보존**: 수집된 Matter 정보는 로컬 컨테이너 내 `/data/matter_data.json`에 영구 보존됩니다. 애드온을 제거하기 전에는 데이터 유실 방지를 위해 반드시 JSON 백업 파일을 내보내기(Export) 하시기 바랍니다.
-- **카메라 권한**: 브라우저 보안 정책에 따라 기기 카메라를 구동하려면 **HTTPS** 보안 프로토콜 또는 **localhost** 접속 환경이 필수적으로 요구됩니다. HTTP 환경에서는 '사진 업로드' 스캔 기능을 대안으로 활용할 수 있습니다.
-- **무결성 체크**: 핵심 구동 소스코드를 임의로 변조할 경우 보안 경고가 기동되며 앱 기능이 제한될 수 있습니다.
-
 
 ## 🇺🇸 English Version
 
-> Matter Device Management & QR Code Backup/Restore Tool (v5.2.2)
+> **Dedicated Home Assistant Add-on for Matter Device Pairing Code & QR Backup/Management (v5.2.2)**
 
-Matter Code Vault is a powerful Home Assistant add-on designed for seamless Matter device management. Securely back up complex pairing codes and QR codes, and manage them intelligently using AI-driven features.
+**Matter Code Vault** is a specialized Home Assistant (HA) add-on designed to **securely back up and restore complex Matter device QR codes, 11-digit setup codes, and device metadata (locations, manufacturers, categories), as well as generate label images for thermal label printers**.
 
 ---
 
-### 🚀 Installation
+### 📦 Key Features
+
+1. **Centralized Matter Backup & Management**
+   - Secure storage for QR code images and 11-digit setup codes.
+   - Categorized by location (Living Room, Bedroom), category (Lights, Sensors), and manufacturer (Aqara, Eve, etc.).
+2. **Verhoeff Checksum Auto-Correction**
+   - Automatically detects and mathematically restores OCR misread numbers (e.g., misreading `0` as `6` or `8`) using the Verhoeff algorithm.
+3. **Thermal Label Printing Support**
+   - Instantly generates label images formatted for thermal label printers.
+4. **Complete Data Backup & Restore**
+   - Export and import all data via `.json` files with duplicate registration prevention and skip metrics.
+5. **Creator Security Masking Mode**
+   - One-click masking of sensitive QR codes and 11-digit setup codes during screen shares or live streams.
+
+---
+
+### 🚀 Installation Guide
 
 To install this add-on, add the following URL to your Home Assistant **Add-on Store** > **Repositories**:
 
 ```text
-https://github.com/your-username/Matter-Code-Vault-AI.git
+https://github.com/dicapriokim/Matter-Code-Vault-AI.git
 ```
 
 1. Navigate to **Settings** > **Add-ons** > **Add-on Store** in Home Assistant.
 2. Click the **Menu** (3 dots) in the top right corner and select **Repositories**.
-3. Paste the URL above and click **Add**.
+3. Paste the URL (`https://github.com/dicapriokim/Matter-Code-Vault-AI.git`) and click **Add**.
 4. Find **Matter Code Vault** in the list and click **Install**.
+
+---
+
+### ⚙️ Add-on Options & Notes
+
+- **Data Storage**: Stored locally at `/data/matter_data.json`. Export a JSON backup before uninstalling.
+- **Camera Access**: Requires **HTTPS** or **localhost** due to browser security policies. (Use 'Photo Upload' for HTTP connections).
+
+---
+
+### 💡 [Optional] Prerequisites: Local AI Setup Guide (Ollama)
+
+> 📌 **Note**: All core features (device registration, 11-digit code backup, JSON restore, label printing) **function 100% normally offline without setting up the AI server**.
+
+To optionally use AI-driven OCR correction and smart naming recommendations, set up your local AI server before running the add-on:
+
+1. **Setup Guide (Proxmox VE LXC)**
+   - For an all-in-one guide covering Proxmox LXC template creation, GPU passthrough, and Ollama engine setup with OpenAI-compatible API:
+   - 👉 [**SuperLLM LXC Setup Guide Document (Ollama + OpenAI)**](https://github.com/dicapriokim/LocalAI-ollama-openai)
+2. **Required Models**:
+   - **Vision Model**: `moondream:latest`
+   - **Text Model**: `qwen2.5:3b`
+3. **Add-on Configuration**:
+   - Enter your local AI server IP (e.g., `192.168.x.x`) in the `local_ai_ip` option field in the HA add-on settings to avoid auto-scan delays.
 
 ---
 
 ### 🏆 Official Release (v5.2.2)
 
-- **AI Proxy Timeout Extension (v5.2.2)**: Extended the AI proxy timeout from 60s to 180s to allow complex reasoning queries to complete on low-end local hardware (e.g., N95 Mini PC) without aborting.
-- **Advanced AI Error Handling (v5.2.1)**: Improved UI error reporting with detailed AI proxy and reasoning pass error messages via dedicated visual alert blocks.
-- **System Prompt Isolation (v5.2.1)**: Separated system instructions into a dedicated 'system' role for AI API requests to enhance the model's context understanding.
-
-- **Smart Filter Reset (v5.1.10)**: Clicking the 'All' category filter now automatically resets active location filters for a cleaner, full-list restore.
-- **Custom Delete Modal (v5.1.9)**: Enhanced delete safety with a custom screen-centered modal display, specifying the device name to be deleted.
-- **Search Clear (X) Button (v5.1.9)**: Clear search input instantly via a responsive, visual 'X' button inside the search field.
-- **JSON Import Duplicate Prevention (v5.1.8)**: Duplicate pairing codes are auto-skipped during JSON backup restores, reporting detailed skip metrics.
-- **Registration Duplicate Block (v5.1.7)**: Prevent duplicate device registrations by cross-comparing QR and 11-digit codes with alert block scenarios.
-- **Verhoeff Checksum Auto-Correction (v5.1.7)**: Intelligent mathematical validation of 11-digit pairing codes with automatic OCR error fixing.
-- **OCR Focus Settle Delay**: Focus settling timers (500ms on load, 300ms on manual capture) to ensure high-accuracy scans.
-- **Backend AI Proxy**: Mixed Content and CORS resolver proxy, routing requests to Ollama Server (v1/chat/completions API).
-- **Vision & Reasoning Models**: Enhanced context analysis with dual `moondream:latest` and `qwen2.5:3b` model pipeline.
-- **Modular Architecture**: Optimized modular structure (`state.js`, `ui.js`, `ai.js`, `scanner.js`) for high performance and maintainability.
+- **AI Proxy Timeout Extension (v5.2.2)**: Extended timeout to 180s for low-end hardware (e.g., N95 Mini PC).
+- **AI Error Handling & System Prompt Isolation (v5.2.1)**: Visual UI error alerts and isolated system prompt role.
+- **Verhoeff Checksum Auto-Correction (v5.1.7)**: Mathematical validation and self-healing pipeline for setup codes.
+- **Smart Filter & Custom Delete Modal (v5.1.9–v5.1.10)**: Responsive filter resets and centered deletion safety modal.
 
 ---
-
-### 🧠 Ollama Server Setup (AI Prerequisites)
-
-To utilize the AI-driven OCR correction and smart naming features, you must set up your local AI server beforehand:
-* **Ollama Server Setup**: Ollama is a lightweight, self-hosted AI server engine that provides OpenAI-compatible API endpoints locally, without communicating with external clouds. If you run a virtualized environment like Proxmox VE, you can refer to the [SuperLLM LXC New Setup Guide Document](https://github.com/dicapriokim/LocalAI-miniPC) to set it up as a high-performance, lightweight LXC container.
-* **Model Load**: Ensure you have successfully loaded the required models on your local AI server:
-  - **Text Model**: `qwen2.5:3b` (or equivalent lightweight text model)
-  - **Vision Model**: `moondream:latest` (for vision-pass OCR analysis)
-
-> **Note**: Core features (device registration, manual setup code entry, JSON backup, and label printing) function perfectly even without the Ollama server.
-
----
-
-### ⚙️ Configuration (AI Proxy)
-
-This add-on features a built-in **Backend AI Proxy** to enable stable communication with local AI servers in HTTPS environments.
-1. **LocalAI Server**: Set your Ollama server IP in the **Add-on Options** (default: `192.168.x.x`). If left empty, it dynamically auto-detects `superllm.local:11434` or Ollama servers on port 11434 in the subnet.
-  - To prevent unnecessary scanning delays (network traffic and time consumption) and ensure fast responses, we recommend directly entering the actual AI server address, 192.168.x.x, as instructed in the manual, instead of letting it default to 127.0.0.1 through auto-scanning.
-2. **Required Models**:
-   - `moondream:latest` (Vision Pass)
-   - `qwen2.5:3b` (Reasoning Pass)
-3. **Internal Routing**: Requests are proxied via `api/ai` to Ollama's OpenAI-compatible completions API endpoint.
-
----
-
-### ⚠️ Important Notes
-
-- **Data Safety**: Data is stored at `/data/matter_data.json`. Always export a JSON backup before deleting the add-on to prevent data loss.
-- **Camera Access**: Requires **HTTPS** or **localhost** due to browser security policies. For HTTP access, use the 'Photo Upload' feature.
-- **Integrity Check**: Unauthorized modification of core files will trigger a security alert, disabling the app.
-
 
 Designed by **돼지지렁이 (PigWorm)** v.5.2.2
 
